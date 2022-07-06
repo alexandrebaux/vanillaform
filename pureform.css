@@ -1,0 +1,42 @@
+.pureform {
+    padding: 0.5em;
+    border: 1px solid #888888;
+}
+
+.pureform__field {
+    position: relative;
+    margin: 0 0 0.5em;
+}
+
+.pureform__subfield {
+    position: relative;
+    padding: 0.5em 2em;
+    margin: 0 0 0.5em;
+    border: 1px solid #888888;
+}
+
+.pureform__label {
+    display: block;
+}
+
+.pureform__dragbtn {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    border: 0;
+    background-color: #babafe;
+    color:#fff;
+    cursor: grab;
+}
+
+.pureform__rmbtn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    border: 0;
+    background-color: #fe3434;
+    color:#fff;
+    cursor: pointer;
+}
