@@ -90,6 +90,27 @@
                     ]
                 },
                 {
+                    branches: [
+                        {
+                            fieldtype: 'radio',
+                            choices: [
+                                {
+                                    label: "Choice 1",
+                                    value: "one"
+                                },
+                                {
+                                    label: "Choice 2",
+                                    value: "two"
+                                },
+                                {
+                                    label: "Choice 3",
+                                    value: "three"
+                                }
+                            ]
+                        },
+                    ]
+                },
+                {
                     components: [
                         {
                             label: 'Simple',
@@ -253,9 +274,7 @@
                     fieldtype: 'hidden',
                 },
             ]
-        });
-
-        form.generate_fields();
+        }).render();
     </script>
 </body>
 </html>
