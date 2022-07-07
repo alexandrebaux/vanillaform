@@ -84,54 +84,56 @@ class pureform {
         
                     });
                     subfields_el.appendChild(rm_btn);
+
+                    (function(subfields_el){
+
+                        var drag_btn = document.createElement('button');
+                        drag_btn.classList.add('pureform__dragbtn');
+                        drag_btn.innerText = '⋮';
+
+                        var mx = null;
+                        var my = null;
+                        var drag_handle = function(e){
+
+                            e.preventDefault();
+
+                            subfields_el.style.top = `${e.clientY - my}px`;
+                            subfields_el.style.left = `${e.clientX - mx}px`;
+                            subfields_el.style.zIndex = `2`;    
+
+                        };
+
+                        drag_btn.addEventListener('mousedown', function(e){
+
+                            e.preventDefault();
+                            
+                            document.addEventListener('mousemove', drag_handle);
+
+                            mx = e.clientX;
+                            my = e.clientY;
+
+                        });
+
+                        drag_btn.addEventListener('mouseup', function(e){
+
+                            e.preventDefault();
+
+                            document.removeEventListener('mousemove', drag_handle);
+
+                            subfields_el.style.top = `${0}px`;
+                            subfields_el.style.left = `${0}px`;
+                            subfields_el.style.zIndex = `1`;
+            
+                        });
+
+                        drag_btn.addEventListener('click', function(e){
+                            e.preventDefault();
+                        });
+
+                        subfields_el.appendChild(drag_btn);
+
+                    })(subfields_el);
                     
-
-                    
-                    
-                    
-
-                    var drag_btn = document.createElement('button');
-                    drag_btn.classList.add('pureform__dragbtn');
-                    drag_btn.innerText = '⋮';
-
-                    var mx = null;
-                    var my = null;
-                    var drag_handle = function(e){
-
-                        e.preventDefault();
-
-                        subfields_el.style.top = `${e.clientY - my}px`;
-                        subfields_el.style.left = `${e.clientX - mx}px`;    
-
-                    };
-
-                    drag_btn.addEventListener('mousedown', function(e){
-
-                        e.preventDefault();
-                        
-                        mx = e.clientX;
-                        my = e.clientY;
-
-                        document.addEventListener('mousemove', drag_handle);
-
-                    });
-
-                    drag_btn.addEventListener('mouseup', function(e){
-
-                        e.preventDefault();
-
-                        document.removeEventListener('mousemove', drag_handle);
-
-                        subfields_el.style.top = `${0}px`;
-                        subfields_el.style.left = `${0}px`;
-        
-                    });
-
-                    drag_btn.addEventListener('click', function(e){
-                        e.preventDefault();
-                    });
-
-                    subfields_el.appendChild(drag_btn);
 
                     field_el.appendChild(subfields_el);
 
