@@ -1,243 +1,299 @@
 class pureform {
 
-    constructor(settings) {
+    constructor (settings) {
+        
+        var self = this;
+        self.settings = settings;
 
-        Object.assign(this, settings);
+        self.build();
 
     }
 
-    generate_field (opt) {
-        
+    fix_field_data (param) {
+
         var self = this;
-        var parent = opt.parent;
-        var before = opt.before;
-        var after = opt.after;
 
-        var field = opt.field;
+        var field = {settings: param.settings};
 
-        var field_index = opt.index;
-        var field_count = 0;
-        var force_initial_field_index = opt.force_initial_field_index || false;
-        var force_next_initial_field_index = opt.force_next_initial_field_index || false;
-        var disable_initial_field_index = opt.disable_initial_field_index || false;
+        Object.assign(field, param.settings);
 
-        var hide_label = opt.hide_label || false;
-        var hide_add_btn = opt.hide_add_btn  || false;
+        if (!field.name) { field.name = `field_${param.index}`; }
         
-        var parent_field_name = opt.parent_field_name || '';
+        if (!field.label) { field.label = `Label ${param.index}`; }
+
+        if (field.fields) { field.fields = []; }
+
+        return field;
         
-        if (parent_field_name && force_initial_field_index) {
-            parent_field_name += `[${force_initial_field_index}]`;
-        } else if (parent_field_name && !disable_initial_field_index) {
-            parent_field_name += `[0]`;
-        }
+    }
 
-        var pure_field_name = field.name || `field_${field_index}`;
-        
-        var field_name =  parent_field_name + pure_field_name;
+    render_fields (param) {
 
-        var field_el = document.createElement('div');
-        field_el.classList.add('pureform__field');
+        var self = this;
 
-        if (field.fieldtype != 'hidden' && !hide_label)  {
+        var fields = param.fields;
+        var fields_el = document.createElement('div');
 
-            var label_el = document.createElement('label');
-            label_el.classList.add('pureform__label');
-            label_el.innerText = field.label || `Field ${field_index}`;
-            label_el.setAttribute('for', field_name);
-            field_el.appendChild(label_el);
-            
-        }
-        
-        if (field.fields) {
+        for (let i = 0; i < fields.length; i++) {
 
-            field_el.classList.add('pureform__field--has-subfield');
+            var field_el = document.createElement('div');
+            field_el.classList.add('pureform__field');
 
-            var field_sub_el = document.createElement('div');
-            field_sub_el.classList.add('pureform__subfield');
-
-            for (let index = 0; index < field.fields.length; index++) {
-
-                var sub_opt = {
-                    parent: field_sub_el,
-                    field: field.fields[index],
-                    index: index,
-                    parent_field_name: field_name
-                };
-
-                if (force_next_initial_field_index) {
-                    sub_opt.force_initial_field_index = force_next_initial_field_index;
-                }
-
-                self.generate_field(sub_opt);
-
+            var field_name = fields[i].name;
+            if (param.prefix_fields_name) {
+                field_name = param.prefix_fields_name + field_name;
             }
 
-            field_el.append(field_sub_el);
+            var field_value = (fields[i].value) ? fields[i].value : null;
 
-            var rm_btn = document.createElement('button');
-            rm_btn.classList.add('pureform__rmbtn');
-            rm_btn.innerText = '×';
-            rm_btn.addEventListener('click', function(e){
+            if (fields[i].fieldtype != 'hidden')  {
+
+                var label_el = document.createElement('label');
+                label_el.classList.add('pureform__label');
+                label_el.innerText = fields[i].label;
+                label_el.setAttribute('for', field_name);
+
+                field_el.appendChild(label_el);
                 
-                e.preventDefault();
+            }
 
-            });
-            field_sub_el.appendChild(rm_btn);
+            if (fields[i].components) {
 
-            var drag_btn = document.createElement('button');
-            drag_btn.classList.add('pureform__dragbtn');
-            drag_btn.innerText = '⋮';
-            drag_btn.addEventListener('click', function(e){
+                    
+            } else if (fields[i].fields) {
+
+                field_el.classList.add('pureform__field--has-subfield');
                 
-                e.preventDefault();
+                for (let j = 0; j < fields[i].fields.length; j++) {
 
-            });
-            field_sub_el.appendChild(drag_btn);
+                    var subfields_el = self.render_fields({
+                        fields: fields[i].fields[j],
+                        prefix_fields_name: `${field_name}[${j}]`
+                    });
+                    subfields_el.classList.add('pureform__subfield');
 
-            if (!hide_add_btn) {
+                    var rm_btn = document.createElement('button');
+                    rm_btn.classList.add('pureform__rmbtn');
+                    rm_btn.innerText = '×';
+                    rm_btn.addEventListener('click', function(e){
+                        
+                        e.preventDefault();
+
+                        fields[i].fields.splice(j, 1);
+
+                        self.render();
+        
+                    });
+                    subfields_el.appendChild(rm_btn);
+        
+                    var drag_btn = document.createElement('button');
+                    drag_btn.classList.add('pureform__dragbtn');
+                    drag_btn.innerText = '⋮';
+                    drag_btn.addEventListener('click', function(e){
+
+                        e.preventDefault();
+        
+                    });
+                    subfields_el.appendChild(drag_btn);
+
+                    field_el.appendChild(subfields_el);
+
+                }
+                
                 var add_btn = document.createElement('button');
                 add_btn.innerText = 'Add';
                 add_btn.addEventListener('click', function(e){
                     
                     e.preventDefault();
-                    self.generate_field({
-                        before: add_btn,
-                        field: field,
-                        parent_field_name: parent_field_name,
-                        hide_label: true,
-                        hide_add_btn: true,
-                        index: field_index,
-                        disable_initial_field_index: true,
-                        force_next_initial_field_index: ++field_count
-                    });
                     
+                    var subfields = fields[i].settings.fields.map(function(field, index){
+                        
+                        return self.fix_field_data({
+                            settings: field,
+                            index: index
+                        });
+                        
+                    });
+
+                    fields[i].fields.push(subfields);
+
+                    self.render();
+
                 });
-                field_el.append(add_btn);
-            }   
-                   
-        } else if (field.fieldtype)  {
+                field_el.appendChild(add_btn);
 
-            if (field.fieldtype == 'textarea' || field.fieldtype == 'wysiwyg')  {
-
-                var input_el = document.createElement('textarea');
-                input_el.setAttribute('name', field_name);
-                input_el.setAttribute('id', field_name);
-
-            }
-            else if (field.fieldtype == 'image' || field.fieldtype == 'file') {
-
-                var input_el = document.createElement('input');
-                input_el.setAttribute('type', 'file');
-                input_el.setAttribute('name', field_name);
-                input_el.setAttribute('id', field_name);
-
-            }
-            else if (field.fieldtype == 'checkbox' || field.fieldtype == 'radio' || field.fieldtype == 'select') {
-
-                var input_el = (field.fieldtype == 'select') ? document.createElement('select') : document.createElement('div');
-                var choices = field.choices;
-
-                if (field.fieldtype == 'checkbox') {
-                    field.multiple = true;
-                } else if (field.fieldtype == 'radio') {
-                    field.multiple = false;
+                    
+            } else if (fields[i].fieldtype)  {
+    
+                if (fields[i].fieldtype == 'textarea' ||
+                    fields[i].fieldtype == 'wysiwyg')  {
+    
+                    var input_el = document.createElement('textarea');
+                    input_el.setAttribute('name', field_name);
+                    input_el.setAttribute('id', field_name);
+                    if (field_value) {
+                        input_el.innerHTML(field_value);
+                    }
+    
                 }
-                
-                if (field.fieldtype == 'select' && field.multiple) {
-                    input_el.setAttribute('name', `${field_name}[]`);
-                } else {
-                    input_el.setAttribute('name', `${field_name}`);
-                }
-
-                for (let index = 0; index < choices.length; index++) {
-                    const choice = choices[index];
-
-                    var choice_label = '';
-                    var choice_value = '';
-
-                    if (typeof choice == 'string') {
-                        choice_label = choice;
-                        choice_value = choice; 
-                    } else if (typeof choice == 'object') {
-                        choice_label = choice.label;
-                        choice_value = choice.value;
+                else if (fields[i].fieldtype == 'image' ||
+                        fields[i].fieldtype == 'file') {
+    
+                    var input_el = document.createElement('input');
+                    input_el.setAttribute('type', 'file');
+                    input_el.setAttribute('name', field_name);
+                    input_el.setAttribute('id', field_name);
+                    if (field_value) {
+                        // todo
                     }
                     
-                    if (field.fieldtype == 'select') {
+    
+                }
+                else if (fields[i].fieldtype == 'checkbox' ||
+                        fields[i].fieldtype == 'radio' ||
+                        fields[i].fieldtype == 'select') {
+    
+                    var input_el = null;
+                    if (fields[i].fieldtype == 'select') {
+                        input_el = document.createElement('select');
+                    } else {
+                        input_el = document.createElement('div');
+                    }
+                    
+                    var choices = fields[i].choices;
 
-                        var sub_input_el = document.createElement('option');
-                        sub_input_el.setAttribute('value', choice_value);
-                        sub_input_el.innerText = choice_label;
-                        input_el.appendChild(sub_input_el);
+                    if (fields[i].fieldtype == 'checkbox') {
+                        fields[i].multiple = true;
+                    } else if (fields[i].fieldtype == 'radio') {
+                        fields[i].multiple = false;
+                    }
+                    
+                    if (fields[i].fieldtype == 'select' && fields[i].multiple) {
+                        input_el.setAttribute('name', `${field_name}[]`);
+                        input_el.setAttribute('multiple', '');
+                    } else {
+                        input_el.setAttribute('name', `${field_name}`);
+                    }
+    
+                    for (let j = 0; j < choices.length; j++) {
+                        
+                        var choice = choices[j];
 
-                    }  else {
-
-                        var sub_input_el = document.createElement('input');
-                        sub_input_el.setAttribute('type', field.fieldtype);
-                        sub_input_el.setAttribute('value', choice_value);
-                        sub_input_el.setAttribute('id', `${field_name}[${index}]`);
-
-                        if (field.multiple) {
-                            sub_input_el.setAttribute('name', `${field_name}[]`);
-                        } else {
-                            sub_input_el.setAttribute('name', `${field_name}`);
+                        var choice_label = '';
+                        var choice_value = '';
+    
+                        if (typeof choice == 'string') {
+                            choice_label = choice;
+                            choice_value = choice; 
+                        } else if (typeof choice == 'object') {
+                            choice_label = choice.label;
+                            choice_value = choice.value;
                         }
                         
-                        input_el.appendChild(sub_input_el);
+                        if (fields[i].fieldtype == 'select') {
+    
+                            var sub_input_el = document.createElement('option');
+                            sub_input_el.setAttribute('value', choice_value);
+                            sub_input_el.innerText = choice_label;
 
-                        var sub_label_el = document.createElement('label');
-                        sub_label_el.innerText = choice_label;
-                        sub_label_el.setAttribute('for', `${field_name}[${index}]`);    
-                        input_el.appendChild(sub_label_el);
+                            if (field_value == choice_value) { 
+                                sub_input_el.setAttribute('selected', '');
+                            }
 
+                            input_el.appendChild(sub_input_el);
+    
+                        }  else {
+    
+                            var sub_input_el = document.createElement('input');
+                            sub_input_el.setAttribute('type', fields[i].fieldtype);
+                            sub_input_el.setAttribute('value', choice_value);
+                            sub_input_el.setAttribute('id', `${field_name}[${j}]`);
+    
+                            if (fields[i].multiple) {
+                                sub_input_el.setAttribute('name', `${field_name}[]`);
+                            } else {
+                                sub_input_el.setAttribute('name', `${field_name}`);
+                            }
+
+                            if (field_value == choice_value) { 
+                                sub_input_el.setAttribute('checked', '');
+                            }
+                            
+                            input_el.appendChild(sub_input_el);
+    
+                            var sub_label_el = document.createElement('label');
+                            sub_label_el.innerText = choice_label;
+                            sub_label_el.setAttribute('for', `${field_name}[${j}]`);    
+                            input_el.appendChild(sub_label_el);
+    
+                        }
+                        
                     }
                     
                 }
+                else {
+    
+                    var input_el = document.createElement('input');
+                    input_el.setAttribute('type', fields[i].fieldtype);
+                    input_el.setAttribute('name', field_name);
+                    input_el.setAttribute('id', field_name);
+                    if (field_value) {
+                        input_el.setAttribute('value', field_value);
+                    }
+                    
+                }
+
+                input_el.addEventListener('input', function() {
+                    
+                    fields[i].value = this.value;
+
+                });
+
+                field_el.appendChild(input_el);
                 
-
             }
-            else {
-
-                var input_el = document.createElement('input');
-                input_el.setAttribute('type', field.fieldtype);
-                input_el.setAttribute('name', field_name);
-                input_el.setAttribute('id', field_name);
-                
-            }
-
-            field_el.append(input_el);
+            
+            fields_el.appendChild(field_el);
 
         }
-        
-        if (parent) {
-            parent.append(field_el);
-        } else if (after) {
-            after.after(field_el);
-        } else if (before) {
-            before.parentNode.insertBefore(field_el, before);
-        }
-        
+
+        return fields_el;
 
     }
 
-    generate_fields() {
+    build () {
 
         var self = this;
-        var el = self.el;
-        var fields = self.fields;
+        self.el = self.settings.el;
+        self.fields = (function(fields) {
 
-        el.classList.add('pureform');
+            var arr = [];
+            for (let i = 0; i < fields.length; i++) {
 
-        for (let index = 0; index < fields.length; index++) {
-            
-            self.generate_field({
-                parent: el,
-                field: fields[index],
-                index: index
-            });
+                var field = self.fix_field_data({
+                    settings: fields[i],
+                    index: i
+                });
+                arr.push(field);
+    
+            }
 
-        }
+            return arr;
+
+        })(self.settings.fields);     
 
     }
+
+    render () {
+
+        var self = this;
+
+        
+
+        var fields_el = self.render_fields({fields: self.fields });
+        self.el.innerHTML = '';
+        self.el.appendChild(fields_el);
+        
+    }
+
 }
