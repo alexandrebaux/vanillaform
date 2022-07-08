@@ -1,5 +1,7 @@
 .pureform {
+    width: 768px;
     padding: 0.5em;
+    margin: 1rem auto;
     border: 1px solid #888888;
 }
 
@@ -29,6 +31,16 @@
     background-color: #babafe;
     color:#fff;
     cursor: grab;
+}
+
+.pureform__dragplaceholder {
+    position: relative;
+    top: initial;
+    left: initial;
+    background-color: #babafe;
+    border: 1px solid #888888;
+    opacity: 0.5;
+    margin: 0 0 0.5em;
 }
 
 .pureform__rmbtn {

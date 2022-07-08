@@ -33,6 +33,10 @@ class pureform {
         var fields = param.fields;
         var fields_el = document.createElement('div');
 
+        if (param.class) {
+            fields_el.classList.add(param.class);
+        }
+
         for (let i = 0; i < fields.length; i++) {
 
             var field_el = document.createElement('div');
@@ -61,10 +65,13 @@ class pureform {
                     
             } else if (fields[i].fields) {
 
+                var subfields_el_wrapper = document.createElement('div');
+                subfields_el_wrapper.classList.add('pureform__subfields_wrapper');
+                
                 field_el.classList.add('pureform__field--has-subfield');
                 
                 for (let j = 0; j < fields[i].fields.length; j++) {
-
+                    
                     var subfields_el = self.render_fields({
                         fields: fields[i].fields[j],
                         prefix_fields_name: `${field_name}[${j}]`
@@ -87,57 +94,148 @@ class pureform {
 
                     (function(subfields_el){
 
+                        var dragplaceholder = document.createElement('div');
+                        dragplaceholder.classList.add('pureform__dragplaceholder');
+
                         var drag_btn = document.createElement('button');
                         drag_btn.classList.add('pureform__dragbtn');
                         drag_btn.innerText = '⋮';
 
-                        var mx = null;
-                        var my = null;
-                        var drag_handle = function(e){
+                        var subfields_el_bound = null;
+                        var subfields_el_bound_y = null;
+                        
+                        var mousemove_timeout = null;
+
+                        var dX = 0;
+                        var dY = 0;
+
+                        var on_mousemove = function(e) {
 
                             e.preventDefault();
 
-                            subfields_el.style.top = `${e.clientY - my}px`;
-                            subfields_el.style.left = `${e.clientX - mx}px`;
-                            subfields_el.style.zIndex = `2`;    
+                            subfields_el_bound = subfields_el.getBoundingClientRect();
+                            subfields_el_bound_y = subfields_el_bound.y || subfields_el_bound.top;
+                            
+                            subfields_el.style.top = `${e.clientY + dY}px`;
+                            subfields_el.style.left = `${e.clientX + dX}px`;
+                            subfields_el.style.zIndex = `2`;
+
+                            if (mousemove_timeout) {
+                                clearTimeout(mousemove_timeout);
+                            }
+
+                            mousemove_timeout = setTimeout(function(){
+                            
+                                var neighbors = [];
+                                for (let index = 0; index < subfields_el.parentElement.children.length; index++) {
+                                    neighbors.push(subfields_el.parentElement.children[index]);
+                                }
+                                
+                                neighbors = neighbors.filter(function(el){
+                                    return el != dragplaceholder;
+                                });
+                                
+                                neighbors = neighbors.map(function(el, index) {
+                                    el.indexOfSameType = index;
+                                    return el;
+                                });
+
+                                for (let k = 0; k < neighbors.length; k++) {
+                                    var neighbor = neighbors[k];
+                                    var neighbor_bound = neighbor.getBoundingClientRect();
+                                    var neighbor_bound_y = neighbor_bound.y || neighbor_bound.top;
+                                    
+                                    var subfields_el_i = subfields_el.indexOfSameType;
+                                    var neighbor_i = neighbor.indexOfSameType;
+                                    
+                                    var shouldIMoveUp = (neighbor_bound_y > subfields_el_bound_y) && (neighbor_i < subfields_el_i);
+                                    var shouldIMoveDown = (neighbor_bound_y < subfields_el_bound_y) && (neighbor_i > subfields_el_i);
+
+                                    if (shouldIMoveUp) {
+
+                                        neighbor.before(subfields_el);
+                                        subfields_el.before(dragplaceholder);
+
+                                        var tmp_index = fields[i].fields[neighbor_i];
+                                        fields[i].fields[neighbor_i] = fields[i].fields[subfields_el_i];
+                                        fields[i].fields[subfields_el_i] = tmp_index;
+
+                                        break;
+
+                                    } else if (shouldIMoveDown) {
+
+                                        
+                                        subfields_el.before(neighbor);
+                                        subfields_el.before(dragplaceholder);
+
+                                        var tmp_index = fields[i].fields[neighbor_i];
+                                        fields[i].fields[neighbor_i] = fields[i].fields[subfields_el_i];
+                                        fields[i].fields[subfields_el_i] = tmp_index;
+                                        
+                                        break;
+                                    }
+                                }
+
+                            }, 20);
 
                         };
 
-                        drag_btn.addEventListener('mousedown', function(e){
+                        
+                        var on_mouseup = function(e) {
 
+                            e.preventDefault();
+
+                            document.removeEventListener('mousemove', on_mousemove);
+                            document.removeEventListener('mouseup', on_mouseup);
+
+                            self.render();
+
+            
+                        };
+
+                        drag_btn.addEventListener('mousedown', function(e) {
+                            
                             e.preventDefault();
                             
-                            document.addEventListener('mousemove', drag_handle);
+                            document.addEventListener('mousemove', on_mousemove);
+                            document.addEventListener('mouseup', on_mouseup); 
 
-                            mx = e.clientX;
-                            my = e.clientY;
+                            subfields_el_bound = subfields_el.getBoundingClientRect();
+
+                            var subfields_el_bound_x = subfields_el_bound.x || subfields_el_bound.left;
+                            var subfields_el_bound_y = subfields_el_bound.y || subfields_el_bound.top;
+
+                            dX = subfields_el_bound_x - e.clientX;
+                            dY = subfields_el_bound_y - e.clientY;
+
+                            dragplaceholder.style.width = `${subfields_el_bound.width}px`;
+                            dragplaceholder.style.height = `${subfields_el_bound.height}px`;
+
+                            subfields_el.style.position = `fixed`;
+                            subfields_el.style.top = `${e.clientY + dY}px`;
+                            subfields_el.style.left = `${e.clientX + dX}px`;
+                            subfields_el.style.width = `${subfields_el_bound.width}px`;
+                            subfields_el.style.height = `${subfields_el_bound.height}px`;
+                            
+                            subfields_el.before(dragplaceholder);
+
+                            
 
                         });
 
-                        drag_btn.addEventListener('mouseup', function(e){
-
+                        drag_btn.addEventListener('click', function(e) {
                             e.preventDefault();
-
-                            document.removeEventListener('mousemove', drag_handle);
-
-                            subfields_el.style.top = `${0}px`;
-                            subfields_el.style.left = `${0}px`;
-                            subfields_el.style.zIndex = `1`;
-            
                         });
 
-                        drag_btn.addEventListener('click', function(e){
-                            e.preventDefault();
-                        });
 
                         subfields_el.appendChild(drag_btn);
 
                     })(subfields_el);
                     
-
-                    field_el.appendChild(subfields_el);
+                    subfields_el_wrapper.appendChild(subfields_el);
 
                 }
+                field_el.appendChild(subfields_el_wrapper);
                 
                 var add_btn = document.createElement('button');
                 add_btn.innerText = 'Add';
@@ -171,7 +269,7 @@ class pureform {
                     input_el.setAttribute('name', field_name);
                     input_el.setAttribute('id', field_name);
                     if (field_value) {
-                        input_el.innerHTML(field_value);
+                        input_el.innerHTML = field_value;
                     }
     
                 }
@@ -327,9 +425,7 @@ class pureform {
 
         var self = this;
 
-        
-
-        var fields_el = self.render_fields({fields: self.fields });
+        var fields_el = self.render_fields({fields: self.fields, class: 'pureform' });
         self.el.innerHTML = '';
         self.el.appendChild(fields_el);
         
