@@ -53,3 +53,24 @@
     color:#fff;
     cursor: pointer;
 }
+
+.pureform__submit {
+    margin: 1em 0 0;
+    padding: 0.5em 0 0;
+    border-top: 1px solid #888888;
+}
+
+.pureform__input_file {
+    visibility: hidden;
+    position: absolute;
+    pointer-events: none;
+}
+
+.pureform__btn {
+    font-size: 1rem;
+    display: inline-block;
+    background-color: #dedede;
+    border: 1px solid #ffffff;
+    padding: 0.5em;
+    cursor: pointer;
+}

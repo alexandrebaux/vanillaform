@@ -276,10 +276,28 @@ class pureform {
                 else if (fields[i].fieldtype == 'image' ||
                         fields[i].fieldtype == 'file') {
     
-                    var input_el = document.createElement('input');
-                    input_el.setAttribute('type', 'file');
-                    input_el.setAttribute('name', field_name);
-                    input_el.setAttribute('id', field_name);
+                    var input_file = document.createElement('input');
+                    input_file.setAttribute('type', 'file');
+                    input_file.setAttribute('id', field_name);
+                    input_file.classList.add('pureform__input_file');
+
+                    var input_label = document.createElement('label');
+                    input_label.setAttribute('for', field_name);
+                    input_label.innerText = 'Select a file';
+                    input_label.classList.add('pureform__btn');
+
+                    var input_hidden = document.createElement('div');
+                    input_hidden.setAttribute('type', 'hidden');
+                    input_hidden.setAttribute('name', field_name);
+
+                    var input_el = document.createElement('div');
+                    
+                    input_el.appendChild(input_hidden);
+                    input_el.appendChild(input_file);
+                    input_el.appendChild(input_label);
+
+                    
+
                     if (field_value) {
                         // todo
                     }
@@ -426,8 +444,21 @@ class pureform {
         var self = this;
 
         var fields_el = self.render_fields({fields: self.fields, class: 'pureform' });
+
+        var submit_btn_wrap = document.createElement('div');
+        submit_btn_wrap.classList.add('pureform__submit');
+
+        var submit_btn = document.createElement('button');
+        submit_btn.setAttribute('type','submit');
+        submit_btn.innerText = 'Submit';
+        submit_btn.classList.add('pureform__btn');
+        submit_btn_wrap.appendChild(submit_btn);
+
+        fields_el.appendChild(submit_btn_wrap);
+
         self.el.innerHTML = '';
         self.el.appendChild(fields_el);
+
         
     }
 
