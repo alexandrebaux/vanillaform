@@ -1,0 +1,82 @@
+.vanillaform,
+.vanillaform * {  box-sizing: border-box; }
+
+.vanillaform {
+    width: 768px;
+    padding: 0.5em;
+    margin: 1rem auto;
+    border: 1px solid #888888;
+}
+
+.vanillaform__label {
+    display: block;
+}
+
+.vanillaform__field {
+    position: relative;
+    margin: 0 0 0.5em;
+}
+
+.vanillaform__subfield {
+    position: relative;
+    padding: 0.5em 2em;
+    margin: 0 0 0.5em;
+    border: 1px solid #888888;
+    background-color: #fefefe;
+}
+
+.vanillaform__inputfile {
+    visibility: hidden;
+    position: absolute;
+    pointer-events: none;
+}
+
+.vanillaform__inputfilelabel {
+    font-size: 1rem;
+    display: inline-block;
+    background-color: #dedede;
+    border: 1px solid #ffffff;
+    padding: 0.5em;
+    cursor: pointer;
+}
+
+.vanillaform__submit {
+    margin: 1em 0 0;
+    padding: 0.5em 0 0;
+    border-top: 1px solid #888888;
+}
+
+
+.vanillaform__rmbtn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    border: 0;
+    background-color: #fe3434;
+    color:#fff;
+    cursor: pointer;
+}
+
+.vanillaform__dragbtn {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    border: 0;
+    background-color: #babafe;
+    color:#fff;
+    cursor: grab;
+}
+
+.vanillaform__dragplaceholder {
+    position: relative;
+    top: initial;
+    left: initial;
+    //background-color: #eeeeee;
+    border: 5px dashed #888888;
+    opacity: 0.5;
+    margin: 0 0 0.5em;
+}
+
+

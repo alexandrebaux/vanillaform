@@ -1,4 +1,4 @@
-class pureform {
+class vanillaform {
 
     constructor (settings) {
         
@@ -39,7 +39,7 @@ class pureform {
         for (let i = 0; i < fields.length; i++) {
 
             var field_el = document.createElement('div');
-            field_el.classList.add('pureform__field');
+            field_el.classList.add('vanillaform__field');
 
             var field_name = fields[i].name;
             if (param.prefix_fields_name) {
@@ -51,7 +51,7 @@ class pureform {
             if (fields[i].fieldtype != 'hidden')  {
 
                 var label_el = document.createElement('label');
-                label_el.classList.add('pureform__label');
+                label_el.classList.add('vanillaform__label');
                 label_el.innerText = fields[i].label;
                 label_el.setAttribute('for', field_name);
 
@@ -62,9 +62,9 @@ class pureform {
             if (fields[i].fields || fields[i].components || fields[i].branches) {
 
                 var subfields_el_wrapper = document.createElement('div');
-                subfields_el_wrapper.classList.add('pureform__subfields_wrapper');
+                subfields_el_wrapper.classList.add('vanillaform__subfields_wrapper');
                 
-                field_el.classList.add('pureform__field--has-subfield');
+                field_el.classList.add('vanillaform__field--has-subfield');
                 
                 if (fields[i].childrens) {
 
@@ -74,10 +74,10 @@ class pureform {
                             fields: fields[i].childrens[j],
                             prefix_fields_name: `${field_name}[${j}]`
                         });
-                        subfields_el.classList.add('pureform__subfield');
+                        subfields_el.classList.add('vanillaform__subfield');
 
                         var rm_btn = document.createElement('button');
-                        rm_btn.classList.add('pureform__rmbtn');
+                        rm_btn.classList.add('vanillaform__rmbtn');
                         rm_btn.innerText = '×';
                         rm_btn.addEventListener('click', function(e){
                             
@@ -93,10 +93,10 @@ class pureform {
                         (function(subfields_el){
 
                             var dragplaceholder = document.createElement('div');
-                            dragplaceholder.classList.add('pureform__dragplaceholder');
+                            dragplaceholder.classList.add('vanillaform__dragplaceholder');
 
                             var drag_btn = document.createElement('button');
-                            drag_btn.classList.add('pureform__dragbtn');
+                            drag_btn.classList.add('vanillaform__dragbtn');
                             drag_btn.innerText = '⋮';
 
                             var subfields_el_bound = null;
@@ -176,7 +176,7 @@ class pureform {
                                         }
                                     }
 
-                                }, 20);
+                                }, 10);
 
                             };
 
@@ -329,12 +329,12 @@ class pureform {
                     var input_file = document.createElement('input');
                     input_file.setAttribute('type', 'file');
                     input_file.setAttribute('id', field_name);
-                    input_file.classList.add('pureform__input_file');
+                    input_file.classList.add('vanillaform__inputfile');
 
                     var input_label = document.createElement('label');
                     input_label.setAttribute('for', field_name);
                     input_label.innerText = 'Select a file';
-                    input_label.classList.add('pureform__btn');
+                    input_label.classList.add('vanillaform__inputfilelabel');
 
                     var input_hidden = document.createElement('div');
                     input_hidden.setAttribute('type', 'hidden');
@@ -486,10 +486,10 @@ class pureform {
 
         var self = this;
 
-        var fields_el = self.render_fields({fields: self.fields, class: 'pureform' });
+        var fields_el = self.render_fields({fields: self.fields, class: 'vanillaform' });
 
         var submit_btn_wrap = document.createElement('div');
-        submit_btn_wrap.classList.add('pureform__submit');
+        submit_btn_wrap.classList.add('vanillaform__submit');
 
         var submit_btn = document.createElement('button');
         submit_btn.setAttribute('type','submit');
