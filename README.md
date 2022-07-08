@@ -1,3 +1,3 @@
-**vanillaform** is a form generator that support Nested, Components and Branch structure.
+**vanillaform** is a form generator that supports nested fields, components and object branches without complex dependencies.
 
-Feel free to comments, suggest and open issues.
+Feel free to make comments, suggestions and report issues.
