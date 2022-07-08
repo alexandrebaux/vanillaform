@@ -7,6 +7,8 @@ class pureform {
         self.build();
     
     }
+
+    // TODO - ADJUST CSS CLASSES NAMES + MAKE THEM CONFIGURABLE 
    
     fix_field_data (param) {
 
