@@ -306,6 +306,36 @@ class vanillaform {
                     field_el.appendChild(add_btn);
 
                 } else if (fields[i].branches) {
+
+                    var branches = fields[i].settings.branches.map(function(e){ return e;});
+                    
+                    branches.push({
+                        label: 'Childrens',
+                        name: 'childrens',
+                        branches: branches.map(function(e){ return e;})
+                    });
+
+                    branches = branches.map(function(field, index){
+                            
+                        return self.fix_field_data({
+                            settings: field,
+                            index: index
+                        });
+                        
+                    });
+
+                    var add_btn = document.createElement('button');
+                    add_btn.innerText = 'Add';
+                    add_btn.addEventListener('click', function(e){
+                        
+                        e.preventDefault();
+
+                        fields[i].childrens.push(branches);
+
+                        self.render();
+
+                    });
+                    field_el.appendChild(add_btn);
                     
                 }
 
