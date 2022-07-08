@@ -150,6 +150,8 @@ class pureform {
                                     
                                     var shouldIMoveUp = (neighbor_bound_y > subfields_el_bound_y) && (neighbor_i < subfields_el_i);
                                     var shouldIMoveDown = (neighbor_bound_y < subfields_el_bound_y) && (neighbor_i > subfields_el_i);
+                                    
+                                    // TODO - ISSUE - The orders of subfield is sometime destroyed when we swap parents item. (HARD)
 
                                     if (shouldIMoveUp) {
 
@@ -296,11 +298,11 @@ class pureform {
                     input_el.appendChild(input_file);
                     input_el.appendChild(input_label);
 
-                    
+                    if (field_value) { input_hidden.value = field_value; }
 
-                    if (field_value) {
-                        // todo
-                    }
+
+                    // Todo - Send File with Pure Ajax, Assign value and preview file. (MEDIUM)
+                    // Must be configurable !!!
                     
     
                 }
@@ -435,7 +437,9 @@ class pureform {
 
             return arr;
 
-        })(self.settings.fields);     
+        })(self.settings.fields);   
+        
+        return self;
 
     }
 
@@ -459,7 +463,7 @@ class pureform {
         self.el.innerHTML = '';
         self.el.appendChild(fields_el);
 
-        
+        return self;
     }
 
 }
