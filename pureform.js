@@ -19,10 +19,7 @@ class pureform {
         Object.assign(field, param.settings);
 
         if (!field.name) { field.name = `field_${param.index}`; }
-        
         if (!field.label) { field.label = `Label ${param.index}`; }
-
-        if (field.fields) { field.fields = []; }
 
         return field;
         
@@ -62,193 +59,193 @@ class pureform {
                 
             }
 
-            if (fields[i].components) {
-
-                    
-            } else if (fields[i].fields) {
+            if (fields[i].fields || fields[i].components || fields[i].branches) {
 
                 var subfields_el_wrapper = document.createElement('div');
                 subfields_el_wrapper.classList.add('pureform__subfields_wrapper');
                 
                 field_el.classList.add('pureform__field--has-subfield');
                 
-                for (let j = 0; j < fields[i].fields.length; j++) {
-                    
-                    var subfields_el = self.render_fields({
-                        fields: fields[i].fields[j],
-                        prefix_fields_name: `${field_name}[${j}]`
-                    });
-                    subfields_el.classList.add('pureform__subfield');
+                if (fields[i].childrens) {
 
-                    var rm_btn = document.createElement('button');
-                    rm_btn.classList.add('pureform__rmbtn');
-                    rm_btn.innerText = '×';
-                    rm_btn.addEventListener('click', function(e){
+                    for (let j = 0; j < fields[i].childrens.length; j++) {
                         
-                        e.preventDefault();
+                        var subfields_el = self.render_fields({
+                            fields: fields[i].childrens[j],
+                            prefix_fields_name: `${field_name}[${j}]`
+                        });
+                        subfields_el.classList.add('pureform__subfield');
 
-                        fields[i].fields.splice(j, 1);
-
-                        self.render();
-        
-                    });
-                    subfields_el.appendChild(rm_btn);
-
-                    (function(subfields_el){
-
-                        var dragplaceholder = document.createElement('div');
-                        dragplaceholder.classList.add('pureform__dragplaceholder');
-
-                        var drag_btn = document.createElement('button');
-                        drag_btn.classList.add('pureform__dragbtn');
-                        drag_btn.innerText = '⋮';
-
-                        var subfields_el_bound = null;
-                        var subfields_el_bound_y = null;
-                        
-                        var mousemove_timeout = null;
-
-                        var dX = 0;
-                        var dY = 0;
-
-                        var on_mousemove = function(e) {
-
+                        var rm_btn = document.createElement('button');
+                        rm_btn.classList.add('pureform__rmbtn');
+                        rm_btn.innerText = '×';
+                        rm_btn.addEventListener('click', function(e){
+                            
                             e.preventDefault();
 
-                            subfields_el_bound = subfields_el.getBoundingClientRect();
-                            subfields_el_bound_y = subfields_el_bound.y || subfields_el_bound.top;
-                            
-                            subfields_el.style.top = `${e.clientY + dY}px`;
-                            subfields_el.style.left = `${e.clientX + dX}px`;
-                            subfields_el.style.zIndex = `2`;
-
-                            if (mousemove_timeout) {
-                                clearTimeout(mousemove_timeout);
-                            }
-
-                            mousemove_timeout = setTimeout(function(){
-                            
-                                var neighbors = [];
-                                for (let index = 0; index < subfields_el.parentElement.children.length; index++) {
-                                    neighbors.push(subfields_el.parentElement.children[index]);
-                                }
-                                
-                                neighbors = neighbors.filter(function(el){
-                                    return el != dragplaceholder;
-                                });
-                                
-                                neighbors = neighbors.map(function(el, index) {
-                                    el.indexOfSameType = index;
-                                    return el;
-                                });
-
-                                for (let k = 0; k < neighbors.length; k++) {
-                                    var neighbor = neighbors[k];
-                                    var neighbor_bound = neighbor.getBoundingClientRect();
-                                    var neighbor_bound_y = neighbor_bound.y || neighbor_bound.top;
-                                    
-                                    var subfields_el_i = subfields_el.indexOfSameType;
-                                    var neighbor_i = neighbor.indexOfSameType;
-                                    
-                                    var shouldIMoveUp = (neighbor_bound_y > subfields_el_bound_y) && (neighbor_i < subfields_el_i);
-                                    var shouldIMoveDown = (neighbor_bound_y < subfields_el_bound_y) && (neighbor_i > subfields_el_i);
-                                    
-                                    // TODO - ISSUE - The orders of subfield is sometime destroyed when we swap parents item. (HARD)
-
-                                    if (shouldIMoveUp) {
-
-                                        neighbor.before(subfields_el);
-                                        subfields_el.before(dragplaceholder);
-
-                                        var tmp_index = fields[i].fields[neighbor_i];
-                                        fields[i].fields[neighbor_i] = fields[i].fields[subfields_el_i];
-                                        fields[i].fields[subfields_el_i] = tmp_index;
-
-                                        break;
-
-                                    } else if (shouldIMoveDown) {
-
-                                        
-                                        subfields_el.before(neighbor);
-                                        subfields_el.before(dragplaceholder);
-
-                                        var tmp_index = fields[i].fields[neighbor_i];
-                                        fields[i].fields[neighbor_i] = fields[i].fields[subfields_el_i];
-                                        fields[i].fields[subfields_el_i] = tmp_index;
-                                        
-                                        break;
-                                    }
-                                }
-
-                            }, 20);
-
-                        };
-
-                        
-                        var on_mouseup = function(e) {
-
-                            e.preventDefault();
-
-                            document.removeEventListener('mousemove', on_mousemove);
-                            document.removeEventListener('mouseup', on_mouseup);
+                            fields[i].childrens.splice(j, 1);
 
                             self.render();
-
             
-                        };
-
-                        drag_btn.addEventListener('mousedown', function(e) {
-                            
-                            e.preventDefault();
-                            
-                            document.addEventListener('mousemove', on_mousemove);
-                            document.addEventListener('mouseup', on_mouseup); 
-
-                            subfields_el_bound = subfields_el.getBoundingClientRect();
-
-                            var subfields_el_bound_x = subfields_el_bound.x || subfields_el_bound.left;
-                            var subfields_el_bound_y = subfields_el_bound.y || subfields_el_bound.top;
-
-                            dX = subfields_el_bound_x - e.clientX;
-                            dY = subfields_el_bound_y - e.clientY;
-
-                            dragplaceholder.style.width = `${subfields_el_bound.width}px`;
-                            dragplaceholder.style.height = `${subfields_el_bound.height}px`;
-
-                            subfields_el.style.position = `fixed`;
-                            subfields_el.style.top = `${e.clientY + dY}px`;
-                            subfields_el.style.left = `${e.clientX + dX}px`;
-                            subfields_el.style.width = `${subfields_el_bound.width}px`;
-                            subfields_el.style.height = `${subfields_el_bound.height}px`;
-                            
-                            subfields_el.before(dragplaceholder);
-
-                            
-
                         });
+                        subfields_el.appendChild(rm_btn);
 
-                        drag_btn.addEventListener('click', function(e) {
-                            e.preventDefault();
-                        });
+                        (function(subfields_el){
 
+                            var dragplaceholder = document.createElement('div');
+                            dragplaceholder.classList.add('pureform__dragplaceholder');
 
-                        subfields_el.appendChild(drag_btn);
+                            var drag_btn = document.createElement('button');
+                            drag_btn.classList.add('pureform__dragbtn');
+                            drag_btn.innerText = '⋮';
 
-                    })(subfields_el);
-                    
-                    subfields_el_wrapper.appendChild(subfields_el);
+                            var subfields_el_bound = null;
+                            var subfields_el_bound_y = null;
+                            
+                            var mousemove_timeout = null;
 
-                }
-                field_el.appendChild(subfields_el_wrapper);
+                            var dX = 0;
+                            var dY = 0;
+
+                            var on_mousemove = function(e) {
+
+                                e.preventDefault();
+
+                                subfields_el_bound = subfields_el.getBoundingClientRect();
+                                subfields_el_bound_y = subfields_el_bound.y || subfields_el_bound.top;
+                                
+                                subfields_el.style.top = `${e.clientY + dY}px`;
+                                subfields_el.style.left = `${e.clientX + dX}px`;
+                                subfields_el.style.zIndex = `2`;
+
+                                if (mousemove_timeout) {
+                                    clearTimeout(mousemove_timeout);
+                                }
+
+                                mousemove_timeout = setTimeout(function(){
+                                
+                                    var neighbors = [];
+                                    for (let index = 0; index < subfields_el.parentElement.children.length; index++) {
+                                        neighbors.push(subfields_el.parentElement.children[index]);
+                                    }
+                                    
+                                    neighbors = neighbors.filter(function(el){
+                                        return el != dragplaceholder;
+                                    });
+                                    
+                                    neighbors = neighbors.map(function(el, index) {
+                                        el.indexOfSameType = index;
+                                        return el;
+                                    });
+
+                                    for (let k = 0; k < neighbors.length; k++) {
+                                        var neighbor = neighbors[k];
+                                        var neighbor_bound = neighbor.getBoundingClientRect();
+                                        var neighbor_bound_y = neighbor_bound.y || neighbor_bound.top;
+                                        
+                                        var subfields_el_i = subfields_el.indexOfSameType;
+                                        var neighbor_i = neighbor.indexOfSameType;
+                                        
+                                        var shouldIMoveUp = (neighbor_bound_y > subfields_el_bound_y) && (neighbor_i < subfields_el_i);
+                                        var shouldIMoveDown = (neighbor_bound_y < subfields_el_bound_y) && (neighbor_i > subfields_el_i);
+                                        
+                                        // TODO - ISSUE - The orders of subfield is sometime destroyed when we swap parents item. (HARD)
+
+                                        if (shouldIMoveUp) {
+
+                                            neighbor.before(subfields_el);
+                                            subfields_el.before(dragplaceholder);
+
+                                            var tmp_index = fields[i].childrens[neighbor_i];
+                                            fields[i].childrens[neighbor_i] = fields[i].childrens[subfields_el_i];
+                                            fields[i].childrens[subfields_el_i] = tmp_index;
+
+                                            break;
+
+                                        } else if (shouldIMoveDown) {
+
+                                            
+                                            subfields_el.before(neighbor);
+                                            subfields_el.before(dragplaceholder);
+
+                                            var tmp_index = fields[i].childrens[neighbor_i];
+                                            fields[i].childrens[neighbor_i] = fields[i].childrens[subfields_el_i];
+                                            fields[i].childrens[subfields_el_i] = tmp_index;
+                                            
+                                            break;
+                                        }
+                                    }
+
+                                }, 20);
+
+                            };
+
+                            
+                            var on_mouseup = function(e) {
+
+                                e.preventDefault();
+
+                                document.removeEventListener('mousemove', on_mousemove);
+                                document.removeEventListener('mouseup', on_mouseup);
+
+                                self.render();
+
                 
-                var add_btn = document.createElement('button');
-                add_btn.innerText = 'Add';
-                add_btn.addEventListener('click', function(e){
-                    
-                    e.preventDefault();
-                    
-                    var subfields = fields[i].settings.fields.map(function(field, index){
+                            };
+
+                            drag_btn.addEventListener('mousedown', function(e) {
+                                
+                                e.preventDefault();
+                                
+                                document.addEventListener('mousemove', on_mousemove);
+                                document.addEventListener('mouseup', on_mouseup); 
+
+                                subfields_el_bound = subfields_el.getBoundingClientRect();
+
+                                var subfields_el_bound_x = subfields_el_bound.x || subfields_el_bound.left;
+                                var subfields_el_bound_y = subfields_el_bound.y || subfields_el_bound.top;
+
+                                dX = subfields_el_bound_x - e.clientX;
+                                dY = subfields_el_bound_y - e.clientY;
+
+                                dragplaceholder.style.width = `${subfields_el_bound.width}px`;
+                                dragplaceholder.style.height = `${subfields_el_bound.height}px`;
+
+                                subfields_el.style.position = `fixed`;
+                                subfields_el.style.top = `${e.clientY + dY}px`;
+                                subfields_el.style.left = `${e.clientX + dX}px`;
+                                subfields_el.style.width = `${subfields_el_bound.width}px`;
+                                subfields_el.style.height = `${subfields_el_bound.height}px`;
+                                
+                                subfields_el.before(dragplaceholder);
+
+                                
+
+                            });
+
+                            drag_btn.addEventListener('click', function(e) {
+                                e.preventDefault();
+                            });
+
+
+                            subfields_el.appendChild(drag_btn);
+
+                        })(subfields_el);
                         
+                        subfields_el_wrapper.appendChild(subfields_el);
+
+                    }
+
+                } else {
+                    fields[i].childrens = [];
+                }
+
+                field_el.appendChild(subfields_el_wrapper);
+
+                if (fields[i].fields) {
+
+                    var subfields = fields[i].settings.fields.map(function(field, index){
+                            
                         return self.fix_field_data({
                             settings: field,
                             index: index
@@ -256,12 +253,61 @@ class pureform {
                         
                     });
 
-                    fields[i].fields.push(subfields);
+                    var add_btn = document.createElement('button');
+                    add_btn.innerText = 'Add';
+                    add_btn.addEventListener('click', function(e){
+                        
+                        e.preventDefault();
 
-                    self.render();
+                        fields[i].childrens.push(subfields);
 
-                });
-                field_el.appendChild(add_btn);
+                        self.render();
+
+                    });
+                    field_el.appendChild(add_btn);
+
+                } else if (fields[i].components) {
+
+                    var subfields_components = fields[i].settings.components.map(function(field, index){
+                            
+                        return self.fix_field_data({
+                            settings: field,
+                            index: index
+                        });
+                        
+                    });
+
+                    var components_select = document.createElement('select');
+                    
+                    for (let l = 0; l < subfields_components.length; l++) {
+                        
+                        var components_select_option = document.createElement('option');
+                        
+                        components_select_option.innerText = subfields_components[l].label;
+                        components_select_option.setAttribute('value', l);
+
+                        components_select.appendChild(components_select_option);
+
+                    }
+
+                    var add_btn = document.createElement('button');
+                    add_btn.innerText = 'Add';
+                   
+                    add_btn.addEventListener('click', function(e){
+                        
+                        e.preventDefault();
+
+                        fields[i].childrens.push([subfields_components[components_select.value]]);
+
+                        self.render();
+
+                    });
+                    field_el.appendChild(components_select);
+                    field_el.appendChild(add_btn);
+
+                } else if (fields[i].branches) {
+                    
+                }
 
                     
             } else if (fields[i].fieldtype)  {
@@ -272,9 +318,9 @@ class pureform {
                     var input_el = document.createElement('textarea');
                     input_el.setAttribute('name', field_name);
                     input_el.setAttribute('id', field_name);
-                    if (field_value) {
-                        input_el.innerHTML = field_value;
-                    }
+                    input_el.addEventListener('input', function() { fields[i].value = this.value; });
+                    
+                    if (field_value) { input_el.innerHTML = field_value; }
     
                 }
                 else if (fields[i].fieldtype == 'image' ||
@@ -293,6 +339,7 @@ class pureform {
                     var input_hidden = document.createElement('div');
                     input_hidden.setAttribute('type', 'hidden');
                     input_hidden.setAttribute('name', field_name);
+                    input_hidden.addEventListener('input', function() { fields[i].value = this.value; });
 
                     var input_el = document.createElement('div');
                     
@@ -315,6 +362,7 @@ class pureform {
                     var input_el = null;
                     if (fields[i].fieldtype == 'select') {
                         input_el = document.createElement('select');
+                        input_el.addEventListener('input', function() { fields[i].value = this.value; });
                     } else {
                         input_el = document.createElement('div');
                     }
@@ -330,8 +378,6 @@ class pureform {
                     if (fields[i].fieldtype == 'select' && fields[i].multiple) {
                         input_el.setAttribute('name', `${field_name}[]`);
                         input_el.setAttribute('multiple', '');
-                    } else {
-                        input_el.setAttribute('name', `${field_name}`);
                     }
     
                     for (let j = 0; j < choices.length; j++) {
@@ -355,9 +401,7 @@ class pureform {
                             sub_input_el.setAttribute('value', choice_value);
                             sub_input_el.innerText = choice_label;
 
-                            if (field_value == choice_value) { 
-                                sub_input_el.setAttribute('selected', '');
-                            }
+                            if (field_value == choice_value) { sub_input_el.setAttribute('selected', '');  }
 
                             input_el.appendChild(sub_input_el);
     
@@ -367,6 +411,7 @@ class pureform {
                             sub_input_el.setAttribute('type', fields[i].fieldtype);
                             sub_input_el.setAttribute('value', choice_value);
                             sub_input_el.setAttribute('id', `${field_name}[${j}]`);
+                            sub_input_el.addEventListener('input', function() { fields[i].value = this.value; });
     
                             if (fields[i].multiple) {
                                 sub_input_el.setAttribute('name', `${field_name}[]`);
@@ -374,9 +419,7 @@ class pureform {
                                 sub_input_el.setAttribute('name', `${field_name}`);
                             }
 
-                            if (field_value == choice_value) { 
-                                sub_input_el.setAttribute('checked', '');
-                            }
+                            if (field_value == choice_value) {  sub_input_el.setAttribute('checked', ''); }
                             
                             input_el.appendChild(sub_input_el);
     
@@ -396,17 +439,11 @@ class pureform {
                     input_el.setAttribute('type', fields[i].fieldtype);
                     input_el.setAttribute('name', field_name);
                     input_el.setAttribute('id', field_name);
-                    if (field_value) {
-                        input_el.setAttribute('value', field_value);
-                    }
+                    input_el.addEventListener('input', function() { fields[i].value = this.value; });
+
+                    if (field_value) { input_el.setAttribute('value', field_value); }
                     
                 }
-
-                input_el.addEventListener('input', function() {
-                    
-                    fields[i].value = this.value;
-
-                });
 
                 field_el.appendChild(input_el);
                 
@@ -457,7 +494,6 @@ class pureform {
         var submit_btn = document.createElement('button');
         submit_btn.setAttribute('type','submit');
         submit_btn.innerText = 'Submit';
-        submit_btn.classList.add('pureform__btn');
         submit_btn_wrap.appendChild(submit_btn);
 
         fields_el.appendChild(submit_btn_wrap);
