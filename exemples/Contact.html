@@ -17,29 +17,29 @@
             el: targeted_wrapper,
             fields: [
                 {
-                    label: "Nom",
+                    label: "Lastname",
                     name: "lastname",
                     fieldtype: "text"
                 },
                 {
-                    label: "Prénom",
+                    label: "Firstname",
                     name: "firstname",
                     fieldtype: "text"
                 },
                 {
-                    label: "Courriel",
+                    label: "Email",
                     name: "email",
                     fieldtype: "email"
                 },
                 {
-                    label: "Sujet",
+                    label: "Subject",
                     name: "subject",
-                    fieldtype: "checkbox",
+                    fieldtype: "radio",
                     choices: [
-                        "Demande d'information",
-                        "Facturation",
-                        "Urgence",
-                        "Autre"
+                        {label:"Information request", value: 0},
+                        {label:"Billing", value: 1},
+                        {label:"Emergency", value: 2},
+                        {label:"Other", value: 3}
                     ]
                 },
                 {
