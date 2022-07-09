@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact</title>
+    <script src="../vanillaform.js"></script>
+    <link rel="stylesheet" href="../vanillaform.css">
+</head>
+<body>
+    <form class="targeted-wrapper" method="post"></form>
+    <script>
+
+        var targeted_wrapper = document.querySelector('.targeted-wrapper');
+        var form = new vanillaform({
+            el: targeted_wrapper,
+            fields: [
+                {
+                    label: "Nom",
+                    name: "lastname",
+                    fieldtype: "text"
+                },
+                {
+                    label: "Prénom",
+                    name: "firstname",
+                    fieldtype: "text"
+                },
+                {
+                    label: "Courriel",
+                    name: "email",
+                    fieldtype: "email"
+                },
+                {
+                    label: "Sujet",
+                    name: "subject",
+                    fieldtype: "checkbox",
+                    choices: [
+                        "Demande d'information",
+                        "Facturation",
+                        "Urgence",
+                        "Autre"
+                    ]
+                },
+                {
+                    label: "Message",
+                    name: "message",
+                    fieldtype: "textarea"
+                }
+            ]
+        }).render();
+    </script>
+</body>
+</html>
