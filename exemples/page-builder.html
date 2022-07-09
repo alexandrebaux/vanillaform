@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Builder</title>
+    <script src="../vanillaform.js"></script>
+    <link rel="stylesheet" href="../vanillaform.css">
+</head>
+<body>
+    <form class="targeted-wrapper" method="post"></form>
+    <script>
+
+        var targeted_wrapper = document.querySelector('.targeted-wrapper');
+        var form = new vanillaform({
+            el: targeted_wrapper,
+            fields: [
+                {
+                    label: "Blocks",
+                    name: "blocks",
+                    components: [
+                        {
+                            label: "Slides",
+                            name: "slides",
+                            repeater: [
+                                {
+                                    label: "Title",
+                                    name: "title",
+                                    fieldtype: "text",
+                                },
+                                {
+                                    label: "Image",
+                                    name: "image",
+                                    fieldtype: "file",
+                                },
+                            ]
+                        },
+                        {
+                            label: "Call To Action",
+                            name: "status",
+                            fieldtype: "textarea",
+                            fields: [
+                                {
+                                    label: "Title",
+                                    name: "title",
+                                    fieldtype: "text",
+                                },
+                                {
+                                    label: "Content",
+                                    name: "content",
+                                    fieldtype: "textarea",
+                                },
+                                {
+                                    label: "Image",
+                                    name: "image",
+                                    fieldtype: "file",
+                                },
+                                {
+                                    label: "Lien",
+                                    name: "link",
+                                    fieldtype: "url",
+                                },
+                            ]
+                        },
+                        {
+                            label: "Content",
+                            name: "status",
+                            fieldtype: "textarea",
+                            fields: [
+                                {
+                                    label: "Title",
+                                    name: "title",
+                                    fieldtype: "text",
+                                },
+                                {
+                                    label: "Content",
+                                    name: "content",
+                                    fieldtype: "textarea",
+                                },
+                            ]
+                        },
+                    ]
+                }
+            ]
+        }).render();
+    </script>
+</body>
+</html>

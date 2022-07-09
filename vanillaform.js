@@ -59,12 +59,25 @@ class vanillaform {
                 
             }
 
-            if (fields[i].fields || fields[i].components || fields[i].branches) {
+            if (fields[i].fields || fields[i].components || fields[i].repeater || fields[i].branches) {
 
                 var subfields_el_wrapper = document.createElement('div');
                 subfields_el_wrapper.classList.add('vanillaform__subfields_wrapper');
                 
                 field_el.classList.add('vanillaform__field--has-subfield');
+                
+                if (fields[i].fields) {
+
+                    var subfields_el = self.render_fields({
+                        fields: fields[i].fields,
+                        prefix_fields_name: `${field_name}`
+                    });
+
+                    subfields_el.classList.add('vanillaform__fields');
+
+                    subfields_el_wrapper.appendChild(subfields_el);
+
+                }
                 
                 if (fields[i].childrens) {
 
@@ -149,8 +162,6 @@ class vanillaform {
                                         var shouldIMoveUp = (neighbor_bound_y > subfields_el_bound_y) && (neighbor_i < subfields_el_i);
                                         var shouldIMoveDown = (neighbor_bound_y < subfields_el_bound_y) && (neighbor_i > subfields_el_i);
                                         
-                                        // TODO - ISSUE - The orders of subfield is sometime destroyed when we swap parents item. (HARD)
-
                                         if (shouldIMoveUp) {
 
                                             neighbor.before(subfields_el);
@@ -219,8 +230,6 @@ class vanillaform {
                                 
                                 subfields_el.before(dragplaceholder);
 
-                                
-
                             });
 
                             drag_btn.addEventListener('click', function(e) {
@@ -246,9 +255,10 @@ class vanillaform {
                     add_btn.classList.add('vanillaform__addbtn');
                     add_btn.innerText = '+';
 
-                if (fields[i].fields) {
 
-                    var subfields = fields[i].settings.fields.map(function(field, index){
+                if (fields[i].repeater) {
+
+                    var subfields = fields[i].settings.repeater.map(function(field, index){
                             
                         return self.fix_field_data({
                             settings: field,
@@ -267,6 +277,7 @@ class vanillaform {
                         self.render();
 
                     });
+
                     field_el.appendChild(add_btn);
 
                 } else if (fields[i].components) {
@@ -302,8 +313,14 @@ class vanillaform {
                         self.render();
 
                     });
-                    field_el.appendChild(components_select);
-                    field_el.appendChild(add_btn);
+
+                    var components_select_wrap = document.createElement('div');
+                    components_select_wrap.classList.add('vanillaform__componentsaction');
+
+                    components_select_wrap.appendChild(components_select);
+                    components_select_wrap.appendChild(add_btn);
+
+                    field_el.appendChild(components_select_wrap);
 
                 } else if (fields[i].branches) {
 
@@ -479,7 +496,11 @@ class vanillaform {
                     input_el.setAttribute('type', fields[i].fieldtype);
                     input_el.setAttribute('name', field_name);
                     input_el.setAttribute('id', field_name);
-                    input_el.addEventListener('input', function() { fields[i].value = this.value; });
+                    input_el.addEventListener('input', function() { 
+
+                        fields[i].value = this.value;
+                    
+                    });
 
                     if (field_value) { input_el.setAttribute('value', field_value); }
                     

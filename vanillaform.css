@@ -22,9 +22,14 @@
 .vanillaform,
 .vanillaform * {  box-sizing: border-box; }
 
+
 .vanillaform__label {
     display: block;
     margin: 0 0 0.2em;
+}
+
+.vanillaform__field--has-subfield > .vanillaform__label {
+    margin: 0 0 0.5em;
 }
 
 .vanillaform,
@@ -35,11 +40,33 @@
     overflow: hidden;
 }
 
+.vanillaform__fields {
+    position: relative;
+    padding: 0.5em;
+    margin: 0 0 0.5em;
+    background-color: #fefefe;
+    border: var(--border);
+    border-radius: var(--border-radius);
+}
+
 .vanillaform__field {
     position: relative;
     margin: 0 0 0.5em;
     width: 100%;
+}
+
+.vanillaform__field:not(.vanillaform__field--has-subfield) {
     padding: 0 0.5em;
+}
+
+
+.vanillaform__subfield {
+    position: relative;
+    padding: 0.5em 2em;
+    margin: 0 0 0.5em;
+    background-color: #fefefe;
+    border: var(--border);
+    border-radius: var(--border-radius);
 }
 
 .vanillaform__field input:not([type="radio"]):not([type="checkbox"]),
@@ -98,15 +125,6 @@
     background-color: var(--current-color);
 }
 
-.vanillaform__subfield {
-    position: relative;
-    padding: 0.5em 2em;
-    margin: 0 0 0.5em;
-    background-color: #fefefe;
-    border: var(--border);
-    border-radius: var(--border-radius);
-}
-
 .vanillaform__inputfile {
     visibility: hidden;
     position: absolute;
@@ -139,6 +157,22 @@
     border: var(--border);
     border-radius: var(--border-radius);
     color: var(--current-color);
+}
+
+.vanillaform__componentsaction {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    border-top: var(--border);
+    padding: 0.5em 0 0;
+}
+
+.vanillaform__componentsaction select {
+    width: auto;
+    max-width: initial;
+    min-width: initial;
+    margin: 0 0.5em 0 0;
+
 }
 
 .vanillaform__rmbtn {

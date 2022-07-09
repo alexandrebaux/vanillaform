@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todos</title>
+    <title>Todos Of Todos</title>
     <script src="../vanillaform.js"></script>
     <link rel="stylesheet" href="../vanillaform.css">
 </head>
@@ -26,16 +26,27 @@
                             fieldtype: "textarea"
                         },
                         {
-                            label: "Status",
-                            name: "status",
-                            fieldtype: "select",
-                            choices: [
-                                {value: "new", label: "New"},
-                                {value: "doing", label: "Doing"},
-                                {value: "label", label: "Done"}
+                            label: "Subtasks",
+                            name: "subtasks",
+                            repeater: [
+                                {
+                                    label: "Task",
+                                    name: "task",
+                                    fieldtype: "textarea"
+                                },
+                                {
+                                    label: "Status",
+                                    name: "status",
+                                    fieldtype: "select",
+                                    choices: [
+                                        {value: "new", label: "New"},
+                                        {value: "doing", label: "Doing"},
+                                        {value: "label", label: "Done"}
+                                    ]
+                                },
                             ]
-                        },
-                    ]
+                        }
+                    ],
                 }
             ]
         }).render();
