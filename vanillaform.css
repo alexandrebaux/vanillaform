@@ -4,7 +4,7 @@
     --current-color: #123456;
     --dragplaceholder-border: 2px dashed var(--current-color);
     --border: 1px solid var(--current-color);
-    --border-radius: 5px;
+    --border-radius: 7px;
 
     font-family: Arial, Helvetica, sans-serif;
     position: relative;
@@ -47,6 +47,10 @@
     background-color: #fefefe;
     border: var(--border);
     border-radius: var(--border-radius);
+}
+
+.vanillaform__field--has-subfield > .vanillaform__fields {
+    padding: 0.5em 0;
 }
 
 .vanillaform__field {

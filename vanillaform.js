@@ -61,9 +61,6 @@ class vanillaform {
 
             if (fields[i].fields || fields[i].components || fields[i].repeater || fields[i].branches) {
 
-                var subfields_el_wrapper = document.createElement('div');
-                subfields_el_wrapper.classList.add('vanillaform__subfields_wrapper');
-                
                 field_el.classList.add('vanillaform__field--has-subfield');
                 
                 if (fields[i].fields) {
@@ -75,11 +72,14 @@ class vanillaform {
 
                     subfields_el.classList.add('vanillaform__fields');
 
-                    subfields_el_wrapper.appendChild(subfields_el);
+                    field_el.appendChild(subfields_el);
 
                 }
                 
                 if (fields[i].childrens) {
+
+                    var subfields_el_wrapper = document.createElement('div');
+                    subfields_el_wrapper.classList.add('vanillaform__subfields_wrapper');
 
                     for (let j = 0; j < fields[i].childrens.length; j++) {
                         
@@ -245,11 +245,13 @@ class vanillaform {
 
                     }
 
+                    field_el.appendChild(subfields_el_wrapper);
+
                 } else {
                     fields[i].childrens = [];
                 }
 
-                field_el.appendChild(subfields_el_wrapper);
+                
 
                 var add_btn = document.createElement('button');
                     add_btn.classList.add('vanillaform__addbtn');
