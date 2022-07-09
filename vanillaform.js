@@ -242,6 +242,10 @@ class vanillaform {
 
                 field_el.appendChild(subfields_el_wrapper);
 
+                var add_btn = document.createElement('button');
+                    add_btn.classList.add('vanillaform__addbtn');
+                    add_btn.innerText = '+';
+
                 if (fields[i].fields) {
 
                     var subfields = fields[i].settings.fields.map(function(field, index){
@@ -253,8 +257,7 @@ class vanillaform {
                         
                     });
 
-                    var add_btn = document.createElement('button');
-                    add_btn.innerText = 'Add';
+                    
                     add_btn.addEventListener('click', function(e){
                         
                         e.preventDefault();
@@ -289,9 +292,6 @@ class vanillaform {
                         components_select.appendChild(components_select_option);
 
                     }
-
-                    var add_btn = document.createElement('button');
-                    add_btn.innerText = 'Add';
                    
                     add_btn.addEventListener('click', function(e){
                         
@@ -324,8 +324,6 @@ class vanillaform {
                         
                     });
 
-                    var add_btn = document.createElement('button');
-                    add_btn.innerText = 'Add';
                     add_btn.addEventListener('click', function(e){
                         
                         e.preventDefault();

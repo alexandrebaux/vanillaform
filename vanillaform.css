@@ -4,12 +4,13 @@
 .vanillaform {
     width: 768px;
     padding: 0.5em;
-    margin: 1rem auto;
+    margin: 1em auto;
     border: 1px solid #888888;
 }
 
 .vanillaform__label {
     display: block;
+    margin: 0 0 0.2em;
 }
 
 .vanillaform__field {
@@ -56,6 +57,17 @@
     background-color: #fe3434;
     color:#fff;
     cursor: pointer;
+    font-size: 1.5em;
+}
+
+.vanillaform__addbtn {
+    border: 0;
+    background-color: #348634;
+    color:#fff;
+    cursor: pointer;
+    width: 1.5em;
+    height: 1.5em;
+    font-size: 1.5em;
 }
 
 .vanillaform__dragbtn {
@@ -67,6 +79,7 @@
     background-color: #babafe;
     color:#fff;
     cursor: grab;
+    font-size: 1.5em;
 }
 
 .vanillaform__dragplaceholder {
