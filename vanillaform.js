@@ -307,12 +307,17 @@ class vanillaform {
 
                 } else if (fields[i].branches) {
 
-                    var branches = fields[i].settings.branches.map(function(e){ return e;});
+                    var branches = fields[i].settings.branches.map(function(e){
+                        return e;
+                    });
                     
+                    var childrens_label = fields[i].childrens_label || 'Add Childrens';
+                    var childrens_name = fields[i].childrens_name ||  'childrens'
+
                     branches.push({
-                        label: 'Childrens',
-                        name: 'childrens',
-                        branches: branches.map(function(e){ return e;})
+                        label: childrens_label, childrens_label: childrens_label,
+                        name: childrens_name, childrens_name: childrens_name,
+                        branches: branches.map(function(e){ return e; })
                     });
 
                     branches = branches.map(function(field, index){
