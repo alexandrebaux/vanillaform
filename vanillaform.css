@@ -2,8 +2,9 @@
 .vanillaform {
 
     --current-color: #123456;
-    --dragplaceholder-border: 5px dashed var(--current-color);
+    --dragplaceholder-border: 2px dashed var(--current-color);
     --border: 1px solid var(--current-color);
+    --border-radius: 5px;
 
     font-family: Arial, Helvetica, sans-serif;
     position: relative;
@@ -14,6 +15,7 @@
 
     color: var(--current-color);
     border: var(--border);
+    border-radius: var(--border-radius);
     
 }
 
@@ -30,6 +32,7 @@
     display: flex;
     flex-wrap: wrap;
     margin: 0 0rem;
+    overflow: hidden;
 }
 
 .vanillaform__field {
@@ -43,7 +46,10 @@
 .vanillaform__field select,
 .vanillaform__field textarea {
     border: var(--border);
+    border-radius: var(--border-radius);
     width: 100%;
+    max-width: 100%;
+    min-width: 100%;
     padding: 0.5em;
 }
 
@@ -76,10 +82,11 @@
 .vanillaform__radio label:before {
     content: '';
     display: inline-block;
-    border: var(--border);
     width: 1em;
     height: 1em;
     margin: 0 0.5em 0 0;
+    border: var(--border);
+    border-radius: var(--border-radius);
 }
 
 .vanillaform__radio label:before {
@@ -95,8 +102,9 @@
     position: relative;
     padding: 0.5em 2em;
     margin: 0 0 0.5em;
-    border: var(--border);
     background-color: #fefefe;
+    border: var(--border);
+    border-radius: var(--border-radius);
 }
 
 .vanillaform__inputfile {
@@ -109,24 +117,27 @@
     font-size: 1rem;
     display: inline-block;
     background-color: #ffffff;
-    border: var(--border);
     padding: 0.5em;
     cursor: pointer;
+    border: var(--border);
+    border-radius: var(--border-radius);
 
 }
 
 .vanillaform__submit {
     margin: 1em 0 0;
     padding: 0.5em 0 0;
-    border-top: var(--border);
     width: 100%;
+    border-top: var(--border);
 }
 
 .vanillaform__submit button {
     font-size: 1rem;
     background: transparent;
     padding: 0.5em;
+    cursor: pointer;
     border: var(--border);
+    border-radius: var(--border-radius);
     color: var(--current-color);
 }
 
@@ -136,20 +147,21 @@
     top: 0;
     bottom: 0;
     border: 0;
-    background-color: #fe3434;
     color:#fff;
     cursor: pointer;
     font-size: 1.5em;
+    background-color: #fe3434;
 }
 
 .vanillaform__addbtn {
     border: 0;
-    background-color: #348634;
     color:#fff;
     cursor: pointer;
     width: 1.5em;
     height: 1.5em;
     font-size: 1.5em;
+    background-color: #348634;
+    border-radius: var(--border-radius);
 }
 
 .vanillaform__dragbtn {
@@ -158,10 +170,10 @@
     top: 0;
     bottom: 0;
     border: 0;
-    background-color: #babafe;
     color:#fff;
     cursor: grab;
     font-size: 1.5em;
+    background-color: #babafe;
 }
 
 .vanillaform__dragplaceholder {
@@ -169,6 +181,7 @@
     top: initial;
     left: initial;
     border: var(--dragplaceholder-border);
+    border-radius: var(--border-radius);
     opacity: 0.5;
     margin: 0 0 0.5em;
 }
