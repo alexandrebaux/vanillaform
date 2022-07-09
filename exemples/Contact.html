@@ -19,12 +19,14 @@
                 {
                     label: "Lastname",
                     name: "lastname",
-                    fieldtype: "text"
+                    fieldtype: "text",
+                    class: "half"
                 },
                 {
                     label: "Firstname",
                     name: "firstname",
-                    fieldtype: "text"
+                    fieldtype: "text",
+                    class: "half"
                 },
                 {
                     label: "Email",
@@ -41,6 +43,12 @@
                         {label:"Emergency", value: 2},
                         {label:"Other", value: 3}
                     ]
+                },
+                {
+                    label: "Join your curriculum vitae",
+                    input_label: 'Choose Your File',
+                    name: "cv",
+                    fieldtype: "file"
                 },
                 {
                     label: "Message",

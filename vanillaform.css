@@ -1,28 +1,101 @@
-.vanillaform,
-.vanillaform * {  box-sizing: border-box; }
 
 .vanillaform {
+
+    --current-color: #123456;
+    --dragplaceholder-border: 5px dashed var(--current-color);
+    --border: 1px solid var(--current-color);
+
+    font-family: Arial, Helvetica, sans-serif;
+    position: relative;
     width: 768px;
+    max-width: 100%;
     padding: 0.5em;
     margin: 1em auto;
-    border: 1px solid #888888;
+
+    color: var(--current-color);
+    border: var(--border);
+    
 }
+
+.vanillaform,
+.vanillaform * {  box-sizing: border-box; }
 
 .vanillaform__label {
     display: block;
     margin: 0 0 0.2em;
 }
 
+.vanillaform,
+.vanillaform__subfield { 
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 0rem;
+}
+
 .vanillaform__field {
     position: relative;
     margin: 0 0 0.5em;
+    width: 100%;
+    padding: 0 0.5em;
+}
+
+.vanillaform__field input:not([type="radio"]):not([type="checkbox"]),
+.vanillaform__field select,
+.vanillaform__field textarea {
+    border: var(--border);
+    width: 100%;
+    padding: 0.5em;
+}
+
+
+.vanillaform__field.half { width: 50%; }
+.vanillaform__field.onethird { width: calc(100% / 3);}
+.vanillaform__field.onequarter { width: 25%; }
+
+.vanillaform__checkbox,
+.vanillaform__radio {
+    margin-right: 1em;
+    
+}
+
+.vanillaform__checkbox input,
+.vanillaform__radio input {
+    pointer-events: none;
+    position: absolute;
+    visibility: hidden;
+}
+
+.vanillaform__checkbox label,
+.vanillaform__radio label {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.vanillaform__checkbox label:before,
+.vanillaform__radio label:before {
+    content: '';
+    display: inline-block;
+    border: var(--border);
+    width: 1em;
+    height: 1em;
+    margin: 0 0.5em 0 0;
+}
+
+.vanillaform__radio label:before {
+    border-radius: 1em;
+}
+
+.vanillaform__checkbox input:checked + label:before,
+.vanillaform__radio input:checked +  label:before {
+    background-color: var(--current-color);
 }
 
 .vanillaform__subfield {
     position: relative;
     padding: 0.5em 2em;
     margin: 0 0 0.5em;
-    border: 1px solid #888888;
+    border: var(--border);
     background-color: #fefefe;
 }
 
@@ -35,18 +108,27 @@
 .vanillaform__inputfilelabel {
     font-size: 1rem;
     display: inline-block;
-    background-color: #dedede;
-    border: 1px solid #ffffff;
+    background-color: #ffffff;
+    border: var(--border);
     padding: 0.5em;
     cursor: pointer;
+
 }
 
 .vanillaform__submit {
     margin: 1em 0 0;
     padding: 0.5em 0 0;
-    border-top: 1px solid #888888;
+    border-top: var(--border);
+    width: 100%;
 }
 
+.vanillaform__submit button {
+    font-size: 1rem;
+    background: transparent;
+    padding: 0.5em;
+    border: var(--border);
+    color: var(--current-color);
+}
 
 .vanillaform__rmbtn {
     position: absolute;
@@ -86,10 +168,8 @@
     position: relative;
     top: initial;
     left: initial;
-    //background-color: #eeeeee;
-    border: 5px dashed #888888;
+    border: var(--dragplaceholder-border);
     opacity: 0.5;
     margin: 0 0 0.5em;
 }
-
 

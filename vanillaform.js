@@ -7,8 +7,6 @@ class vanillaform {
         self.build();
     
     }
-
-    // TODO - ADJUST CSS CLASSES NAMES + MAKE THEM CONFIGURABLE 
    
     fix_field_data (param) {
 
@@ -40,6 +38,8 @@ class vanillaform {
 
             var field_el = document.createElement('div');
             field_el.classList.add('vanillaform__field');
+
+            if (fields[i].class) { field_el.classList.add(fields[i].class); }
 
             var field_name = fields[i].name;
             if (param.prefix_fields_name) {
@@ -361,7 +361,7 @@ class vanillaform {
 
                     var input_label = document.createElement('label');
                     input_label.setAttribute('for', field_name);
-                    input_label.innerText = 'Select a file';
+                    input_label.innerText = (fields[i].input_label) ? fields[i].input_label : 'Select a file';
                     input_label.classList.add('vanillaform__inputfilelabel');
 
                     var input_hidden = document.createElement('div');
@@ -393,7 +393,10 @@ class vanillaform {
                         input_el.addEventListener('input', function() { fields[i].value = this.value; });
                     } else {
                         input_el = document.createElement('div');
+                        input_el.classList.add('vanillaform__group');
                     }
+
+                    
                     
                     var choices = fields[i].choices;
 
@@ -434,7 +437,10 @@ class vanillaform {
                             input_el.appendChild(sub_input_el);
     
                         }  else {
-    
+                            
+                            var sub_input_el_wrap = document.createElement('div');
+                            sub_input_el_wrap.classList.add(`vanillaform__${fields[i].fieldtype}`);
+
                             var sub_input_el = document.createElement('input');
                             sub_input_el.setAttribute('type', fields[i].fieldtype);
                             sub_input_el.setAttribute('value', choice_value);
@@ -448,14 +454,15 @@ class vanillaform {
                             }
 
                             if (field_value == choice_value) {  sub_input_el.setAttribute('checked', ''); }
-                            
-                            input_el.appendChild(sub_input_el);
+
+                            sub_input_el_wrap.appendChild(sub_input_el);
     
                             var sub_label_el = document.createElement('label');
                             sub_label_el.innerText = choice_label;
                             sub_label_el.setAttribute('for', `${field_name}[${j}]`);    
-                            input_el.appendChild(sub_label_el);
-    
+                            sub_input_el_wrap.appendChild(sub_label_el);
+                            
+                            input_el.appendChild(sub_input_el_wrap);
                         }
                         
                     }
