@@ -301,7 +301,11 @@ class vanillaform {
                         
                         e.preventDefault();
 
-                        fields[i].childrens.push(subfields);
+                        var subfields_clone = subfields;
+                        subfields_clone = JSON.stringify(subfields_clone);
+                        subfields_clone = JSON.parse(subfields_clone);
+
+                        fields[i].childrens.push(subfields_clone);
 
                         self.render();
 
@@ -336,8 +340,12 @@ class vanillaform {
                     add_btn.addEventListener('click', function(e){
                         
                         e.preventDefault();
+                        
+                        var field_clone = subfields_components[components_select.value];
+                        field_clone = JSON.stringify(field_clone);
+                        field_clone = JSON.parse(field_clone);
 
-                        fields[i].childrens.push([subfields_components[components_select.value]]);
+                        fields[i].childrens.push([field_clone]);
 
                         self.render();
 
@@ -379,7 +387,11 @@ class vanillaform {
                         
                         e.preventDefault();
 
-                        fields[i].childrens.push(branches);
+                        var branches_clone = branches;
+                        branches_clone = JSON.stringify(branches_clone);
+                        branches_clone = JSON.parse(branches_clone);
+
+                        fields[i].childrens.push(branches_clone);
 
                         self.render();
 
@@ -446,11 +458,7 @@ class vanillaform {
                         input_el = document.createElement('div');
                         input_el.classList.add('vanillaform__group');
                     }
-
-                    
-                    
-                    var choices = fields[i].choices;
-
+    
                     if (fields[i].type == 'checkbox') {
                         fields[i].multiple = true;
                     } else if (fields[i].type == 'radio') {
@@ -461,7 +469,8 @@ class vanillaform {
                         input_el.setAttribute('name', `${field_name}[]`);
                         input_el.setAttribute('multiple', '');
                     }
-    
+                    
+                    var choices = fields[i].choices;
                     for (let j = 0; j < choices.length; j++) {
                         
                         var choice = choices[j];

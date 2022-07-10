@@ -25,10 +25,8 @@
 
     font-family: Arial, Helvetica, sans-serif;
     position: relative;
-    width: 768px;
-    max-width: 100%;
+    width: 100%;
     padding: 0.5em;
-    margin: 1em auto;
 
     color: var(--current-color);
     border: var(--border);
