@@ -161,30 +161,22 @@ class vanillaform {
                                         
                                         var shouldIMoveUp = (neighbor_bound_y > subfields_el_bound_y) && (neighbor_i < subfields_el_i);
                                         var shouldIMoveDown = (neighbor_bound_y < subfields_el_bound_y) && (neighbor_i > subfields_el_i);
-                                        
-                                        if (shouldIMoveUp) {
 
-                                            neighbor.before(subfields_el);
+                                        if (shouldIMoveUp || shouldIMoveDown) {
+
+                                            if (shouldIMoveUp) { neighbor.before(subfields_el); }
+                                            if (shouldIMoveDown) { subfields_el.before(neighbor); }
+
                                             subfields_el.before(dragplaceholder);
 
-                                            var tmp_index = fields[i].childrens[neighbor_i];
-                                            fields[i].childrens[neighbor_i] = fields[i].childrens[subfields_el_i];
-                                            fields[i].childrens[subfields_el_i] = tmp_index;
+                                            var index_a = fields[i].childrens[neighbor_i];
+                                            var index_b = fields[i].childrens[subfields_el_i];
 
-                                            break;
-
-                                        } else if (shouldIMoveDown) {
-
+                                            fields[i].childrens[neighbor_i] = index_b;
+                                            fields[i].childrens[subfields_el_i] = index_a;
                                             
-                                            subfields_el.before(neighbor);
-                                            subfields_el.before(dragplaceholder);
-
-                                            var tmp_index = fields[i].childrens[neighbor_i];
-                                            fields[i].childrens[neighbor_i] = fields[i].childrens[subfields_el_i];
-                                            fields[i].childrens[subfields_el_i] = tmp_index;
-                                            
-                                            break;
                                         }
+
                                     }
 
                                 }, 10);
@@ -204,7 +196,7 @@ class vanillaform {
                 
                             };
 
-                            drag_btn.addEventListener('mousedown', function(e) {
+                            var on_mousedown = function(e) {
                                 
                                 e.preventDefault();
                                 
@@ -230,11 +222,11 @@ class vanillaform {
                                 
                                 subfields_el.before(dragplaceholder);
 
-                            });
+                            }
 
-                            drag_btn.addEventListener('click', function(e) {
-                                e.preventDefault();
-                            });
+                            drag_btn.addEventListener('mousedown', on_mousedown);
+
+                            drag_btn.addEventListener('click', function(e) { e.preventDefault(); });
 
 
                             subfields_el.appendChild(drag_btn);
