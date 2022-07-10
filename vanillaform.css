@@ -22,6 +22,9 @@
 .vanillaform,
 .vanillaform * {  box-sizing: border-box; }
 
+.vanillaform__content {
+    width: 100%;
+}
 
 .vanillaform__label {
     display: block;

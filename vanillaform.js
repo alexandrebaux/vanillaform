@@ -206,9 +206,7 @@ class vanillaform {
         var fields = param.fields;
         var fields_el = document.createElement('div');
 
-        if (param.class) {
-            fields_el.classList.add(param.class);
-        }
+        if (param.class) { fields_el.classList.add(param.class); }
 
         for (let i = 0; i < fields.length; i++) {
 
@@ -555,7 +553,7 @@ class vanillaform {
 
         if (self.callbacks && typeof self.callbacks.before_render == 'function') { self.callbacks.before_render(); }
 
-        var fields_el = self.render_fields({fields: self.fields, class: 'vanillaform' });
+        var fields_el = self.render_fields({fields: self.fields, class: 'vanillaform__content'});
 
         var submit_btn_wrap = document.createElement('div');
         submit_btn_wrap.classList.add('vanillaform__submit');
@@ -567,8 +565,12 @@ class vanillaform {
 
         fields_el.appendChild(submit_btn_wrap);
 
+        var form = document.createElement('form');
+        form.classList.add('vanillaform');
+        form.appendChild(fields_el);
+
         self.el.innerHTML = '';
-        self.el.appendChild(fields_el);
+        self.el.appendChild(form);
 
         if (self.callbacks && typeof self.callbacks.after_render == 'function') { self.callbacks.after_render(); }
 
