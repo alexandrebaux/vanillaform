@@ -170,6 +170,8 @@ class vanillaform {
 
             el_bound = el.getBoundingClientRect();
 
+            el.classList.add('vanillaform__dragging');
+
             var el_bound_x = el_bound.x || el_bound.left;
             var el_bound_y = el_bound.y || el_bound.top;
 
@@ -560,7 +562,7 @@ class vanillaform {
 
         var submit_btn = document.createElement('button');
         submit_btn.setAttribute('type','submit');
-        submit_btn.innerText = 'Submit';
+        submit_btn.innerText = self.settings.submit_btn_label || 'Submit';
         submit_btn_wrap.appendChild(submit_btn);
 
         fields_el.appendChild(submit_btn_wrap);

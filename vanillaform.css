@@ -1,10 +1,27 @@
 
 .vanillaform {
 
-    --current-color: #123456;
-    --dragplaceholder-border: 2px dashed var(--current-color);
-    --border: 1px solid var(--current-color);
-    --border-radius: 7px;
+    --current-color: #003049;
+    --dragplaceholder-border: 2px dashed #669BBC;
+    --border: 1px solid #669BBC;
+    --border-radius: 3px;
+
+    --form-bg: #ffffff;
+
+    --fields-bg: var(--form-bg);
+    --field-bg: transparent;
+    --subfield-bg: rgba(0,0,0,0.02);
+    --draging-subfield-bg: #ffffff;
+
+    --btn-add-color: #ffffff;
+    --btn-add-bgcolor: #52b788;
+
+    --btn-drag-color: #ffffff;
+    --btn-drag-bgcolor: #669BBC;
+
+    --btn-remove-color: #ffffff;
+    --btn-remove-bgcolor: #C1121F;
+
 
     font-family: Arial, Helvetica, sans-serif;
     position: relative;
@@ -47,7 +64,7 @@
     position: relative;
     padding: 0.5em;
     margin: 0 0 0.5em;
-    background-color: #fefefe;
+    background-color: var(--fields-bg);
     border: var(--border);
     border-radius: var(--border-radius);
 }
@@ -60,6 +77,7 @@
     position: relative;
     margin: 0 0 0.5em;
     width: 100%;
+    background-color: var(--field-bg);
 }
 
 .vanillaform__field:not(.vanillaform__field--has-subfield) {
@@ -71,9 +89,12 @@
     position: relative;
     padding: 0.5em 2em;
     margin: 0 0 0.5em;
-    background-color: #fefefe;
-    border: var(--border);
+    background-color: var(--subfield-bg);
     border-radius: var(--border-radius);
+}
+
+.vanillaform__subfield.vanillaform__dragging {
+    background: var(--draging-subfield-bg);
 }
 
 .vanillaform__field input:not([type="radio"]):not([type="checkbox"]),
@@ -141,7 +162,7 @@
 .vanillaform__inputfilelabel {
     font-size: 1rem;
     display: inline-block;
-    background-color: #ffffff;
+    background-color: var(--form-bg);
     padding: 0.5em;
     cursor: pointer;
     border: var(--border);
@@ -188,20 +209,21 @@
     top: 0;
     bottom: 0;
     border: 0;
-    color:#fff;
     cursor: pointer;
     font-size: 1.5em;
-    background-color: #fe3434;
+    color:var(--btn-remove-color);
+    background-color: var(--btn-remove-bgcolor);
 }
 
 .vanillaform__addbtn {
     border: 0;
-    color:#fff;
+    
     cursor: pointer;
     width: 1.5em;
     height: 1.5em;
     font-size: 1.5em;
-    background-color: #348634;
+    color:var(--btn-add-color);
+    background-color: var(--btn-add-bgcolor);
     border-radius: var(--border-radius);
 }
 
@@ -211,10 +233,10 @@
     top: 0;
     bottom: 0;
     border: 0;
-    color:#fff;
     cursor: grab;
     font-size: 1.5em;
-    background-color: #babafe;
+    color:var(--btn-drag-color);
+    background-color: var(--btn-drag-bgcolor);
 }
 
 .vanillaform__dragplaceholder {
@@ -226,4 +248,3 @@
     opacity: 0.5;
     margin: 0 0 0.5em;
 }
-
