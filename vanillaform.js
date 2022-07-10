@@ -41,7 +41,7 @@ class vanillaform {
         
     }
 
-    removable (el, field) {
+    removable (el, field, index) {
 
         var self = this;
 
@@ -52,7 +52,7 @@ class vanillaform {
             
             e.preventDefault();
 
-            field.childrens.splice(j, 1);
+            field.childrens.splice(index, 1);
 
             self.render();
 
@@ -265,7 +265,7 @@ class vanillaform {
                         });
                         subfields_el.classList.add('vanillaform__subfield');
 
-                        self.removable(subfields_el, fields[i]);
+                        self.removable(subfields_el, fields[i], j);
                         self.draguable(subfields_el, fields[i]);
                         
                         subfields_el_wrapper.appendChild(subfields_el);
