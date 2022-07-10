@@ -4,7 +4,24 @@ class vanillaform {
         
         var self = this;
         self.settings = settings;
-        self.build();
+        
+        self.el = self.settings.el;
+        self.fields = (function(fields) {
+
+            var arr = [];
+            for (let i = 0; i < fields.length; i++) {
+
+                var field = self.fix_field_data({
+                    settings: fields[i],
+                    index: i
+                });
+                arr.push(field);
+    
+            }
+
+            return arr;
+
+        })(self.settings.fields);   
     
     }
    
@@ -18,9 +35,168 @@ class vanillaform {
 
         if (!field.name) { field.name = `field_${param.index}`; }
         if (!field.label) { field.label = `Label ${param.index}`; }
+        if (!field.type) { field.type = `text`; }
 
         return field;
         
+    }
+
+    removable (el, field) {
+
+        var self = this;
+
+        var rm_btn = document.createElement('button');
+        rm_btn.classList.add('vanillaform__rmbtn');
+        rm_btn.innerText = '×';
+        rm_btn.addEventListener('click', function(e){
+            
+            e.preventDefault();
+
+            field.childrens.splice(j, 1);
+
+            self.render();
+
+        });
+        el.appendChild(rm_btn);
+
+        return true;
+    }
+
+    draguable (el, field) {
+
+        var self = this;
+
+        var dragplaceholder = document.createElement('div');
+        dragplaceholder.classList.add('vanillaform__dragplaceholder');
+
+        var drag_btn = document.createElement('button');
+        drag_btn.classList.add('vanillaform__dragbtn');
+        drag_btn.innerText = '⋮';
+
+        var el_bound = null;
+        var el_bound_y = null;
+        
+        var mousemove_timeout = null;
+
+        var dX = 0;
+        var dY = 0;
+
+        var on_mousemove = function(e) {
+
+            e.preventDefault();
+
+            el_bound = el.getBoundingClientRect();
+            el_bound_y = el_bound.y || el_bound.top;
+            
+            el.style.top = `${e.clientY + dY}px`;
+            el.style.left = `${e.clientX + dX}px`;
+            el.style.zIndex = `2`;
+
+            if (mousemove_timeout) {
+                clearTimeout(mousemove_timeout);
+            }
+
+            mousemove_timeout = setTimeout(function(){
+            
+                var neighbors = [];
+                for (let index = 0; index < el.parentElement.children.length; index++) {
+                    neighbors.push(el.parentElement.children[index]);
+                }
+                
+                neighbors = neighbors.filter(function(el){
+                    return el != dragplaceholder;
+                });
+                
+                neighbors = neighbors.map(function(el, index) {
+                    el.indexOfSameType = index;
+                    return el;
+                });
+
+                for (let k = 0; k < neighbors.length; k++) {
+                    var neighbor = neighbors[k];
+                    var neighbor_bound = neighbor.getBoundingClientRect();
+                    var neighbor_bound_y = neighbor_bound.y || neighbor_bound.top;
+                    
+                    var el_i = el.indexOfSameType;
+                    var neighbor_i = neighbor.indexOfSameType;
+                    
+                    var shouldIMoveUp = (neighbor_bound_y > el_bound_y) && (neighbor_i < el_i);
+                    var shouldIMoveDown = (neighbor_bound_y < el_bound_y) && (neighbor_i > el_i);
+
+                    if (shouldIMoveUp || shouldIMoveDown) {
+
+                        if (shouldIMoveUp) { neighbor.before(el); }
+                        if (shouldIMoveDown) { el.before(neighbor); }
+
+                        el.before(dragplaceholder);
+
+                        if (field) {
+
+                            var index_a = field.childrens[neighbor_i];
+                            var index_b = field.childrens[el_i];
+    
+                            field.childrens[neighbor_i] = index_b;
+                            field.childrens[el_i] = index_a;
+
+                        }
+                        
+                    }
+
+                }
+
+            }, 10);
+
+        };
+
+        
+        var on_mouseup = function(e) {
+
+            e.preventDefault();
+
+            document.removeEventListener('mousemove', on_mousemove);
+            document.removeEventListener('mouseup', on_mouseup);
+
+            self.render();
+
+
+        };
+
+        var on_mousedown = function(e) {
+            
+            e.preventDefault();
+            
+            document.addEventListener('mousemove', on_mousemove);
+            document.addEventListener('mouseup', on_mouseup); 
+
+            el_bound = el.getBoundingClientRect();
+
+            var el_bound_x = el_bound.x || el_bound.left;
+            var el_bound_y = el_bound.y || el_bound.top;
+
+            dX = el_bound_x - e.clientX;
+            dY = el_bound_y - e.clientY;
+
+            dragplaceholder.style.width = `${el_bound.width}px`;
+            dragplaceholder.style.height = `${el_bound.height}px`;
+
+            el.style.position = `fixed`;
+            el.style.top = `${e.clientY + dY}px`;
+            el.style.left = `${e.clientX + dX}px`;
+            el.style.width = `${el_bound.width}px`;
+            el.style.height = `${el_bound.height}px`;
+            
+            el.before(dragplaceholder);
+
+        }
+
+        drag_btn.addEventListener('mousedown', on_mousedown);
+
+        drag_btn.addEventListener('click', function(e) { e.preventDefault(); });
+
+        el.appendChild(drag_btn);
+
+        return true;
+
     }
 
     render_fields (param) {
@@ -48,7 +224,7 @@ class vanillaform {
 
             var field_value = (fields[i].value) ? fields[i].value : null;
 
-            if (fields[i].fieldtype != 'hidden')  {
+            if (fields[i].type != 'hidden')  {
 
                 var label_el = document.createElement('label');
                 label_el.classList.add('vanillaform__label');
@@ -89,149 +265,8 @@ class vanillaform {
                         });
                         subfields_el.classList.add('vanillaform__subfield');
 
-                        var rm_btn = document.createElement('button');
-                        rm_btn.classList.add('vanillaform__rmbtn');
-                        rm_btn.innerText = '×';
-                        rm_btn.addEventListener('click', function(e){
-                            
-                            e.preventDefault();
-
-                            fields[i].childrens.splice(j, 1);
-
-                            self.render();
-            
-                        });
-                        subfields_el.appendChild(rm_btn);
-
-                        (function(subfields_el){
-
-                            var dragplaceholder = document.createElement('div');
-                            dragplaceholder.classList.add('vanillaform__dragplaceholder');
-
-                            var drag_btn = document.createElement('button');
-                            drag_btn.classList.add('vanillaform__dragbtn');
-                            drag_btn.innerText = '⋮';
-
-                            var subfields_el_bound = null;
-                            var subfields_el_bound_y = null;
-                            
-                            var mousemove_timeout = null;
-
-                            var dX = 0;
-                            var dY = 0;
-
-                            var on_mousemove = function(e) {
-
-                                e.preventDefault();
-
-                                subfields_el_bound = subfields_el.getBoundingClientRect();
-                                subfields_el_bound_y = subfields_el_bound.y || subfields_el_bound.top;
-                                
-                                subfields_el.style.top = `${e.clientY + dY}px`;
-                                subfields_el.style.left = `${e.clientX + dX}px`;
-                                subfields_el.style.zIndex = `2`;
-
-                                if (mousemove_timeout) {
-                                    clearTimeout(mousemove_timeout);
-                                }
-
-                                mousemove_timeout = setTimeout(function(){
-                                
-                                    var neighbors = [];
-                                    for (let index = 0; index < subfields_el.parentElement.children.length; index++) {
-                                        neighbors.push(subfields_el.parentElement.children[index]);
-                                    }
-                                    
-                                    neighbors = neighbors.filter(function(el){
-                                        return el != dragplaceholder;
-                                    });
-                                    
-                                    neighbors = neighbors.map(function(el, index) {
-                                        el.indexOfSameType = index;
-                                        return el;
-                                    });
-
-                                    for (let k = 0; k < neighbors.length; k++) {
-                                        var neighbor = neighbors[k];
-                                        var neighbor_bound = neighbor.getBoundingClientRect();
-                                        var neighbor_bound_y = neighbor_bound.y || neighbor_bound.top;
-                                        
-                                        var subfields_el_i = subfields_el.indexOfSameType;
-                                        var neighbor_i = neighbor.indexOfSameType;
-                                        
-                                        var shouldIMoveUp = (neighbor_bound_y > subfields_el_bound_y) && (neighbor_i < subfields_el_i);
-                                        var shouldIMoveDown = (neighbor_bound_y < subfields_el_bound_y) && (neighbor_i > subfields_el_i);
-
-                                        if (shouldIMoveUp || shouldIMoveDown) {
-
-                                            if (shouldIMoveUp) { neighbor.before(subfields_el); }
-                                            if (shouldIMoveDown) { subfields_el.before(neighbor); }
-
-                                            subfields_el.before(dragplaceholder);
-
-                                            var index_a = fields[i].childrens[neighbor_i];
-                                            var index_b = fields[i].childrens[subfields_el_i];
-
-                                            fields[i].childrens[neighbor_i] = index_b;
-                                            fields[i].childrens[subfields_el_i] = index_a;
-                                            
-                                        }
-
-                                    }
-
-                                }, 10);
-
-                            };
-
-                            
-                            var on_mouseup = function(e) {
-
-                                e.preventDefault();
-
-                                document.removeEventListener('mousemove', on_mousemove);
-                                document.removeEventListener('mouseup', on_mouseup);
-
-                                self.render();
-
-                
-                            };
-
-                            var on_mousedown = function(e) {
-                                
-                                e.preventDefault();
-                                
-                                document.addEventListener('mousemove', on_mousemove);
-                                document.addEventListener('mouseup', on_mouseup); 
-
-                                subfields_el_bound = subfields_el.getBoundingClientRect();
-
-                                var subfields_el_bound_x = subfields_el_bound.x || subfields_el_bound.left;
-                                var subfields_el_bound_y = subfields_el_bound.y || subfields_el_bound.top;
-
-                                dX = subfields_el_bound_x - e.clientX;
-                                dY = subfields_el_bound_y - e.clientY;
-
-                                dragplaceholder.style.width = `${subfields_el_bound.width}px`;
-                                dragplaceholder.style.height = `${subfields_el_bound.height}px`;
-
-                                subfields_el.style.position = `fixed`;
-                                subfields_el.style.top = `${e.clientY + dY}px`;
-                                subfields_el.style.left = `${e.clientX + dX}px`;
-                                subfields_el.style.width = `${subfields_el_bound.width}px`;
-                                subfields_el.style.height = `${subfields_el_bound.height}px`;
-                                
-                                subfields_el.before(dragplaceholder);
-
-                            }
-
-                            drag_btn.addEventListener('mousedown', on_mousedown);
-
-                            drag_btn.addEventListener('click', function(e) { e.preventDefault(); });
-
-
-                            subfields_el.appendChild(drag_btn);
-
-                        })(subfields_el);
+                        self.removable(subfields_el, fields[i]);
+                        self.draguable(subfields_el, fields[i]);
                         
                         subfields_el_wrapper.appendChild(subfields_el);
 
@@ -354,10 +389,10 @@ class vanillaform {
                 }
 
                     
-            } else if (fields[i].fieldtype)  {
+            } else if (fields[i].type)  {
     
-                if (fields[i].fieldtype == 'textarea' ||
-                    fields[i].fieldtype == 'wysiwyg')  {
+                if (fields[i].type == 'textarea' ||
+                    fields[i].type == 'wysiwyg')  {
     
                     var input_el = document.createElement('textarea');
                     input_el.setAttribute('name', field_name);
@@ -367,8 +402,8 @@ class vanillaform {
                     if (field_value) { input_el.innerHTML = field_value; }
     
                 }
-                else if (fields[i].fieldtype == 'image' ||
-                        fields[i].fieldtype == 'file') {
+                else if (fields[i].type == 'image' ||
+                        fields[i].type == 'file') {
     
                     var input_file = document.createElement('input');
                     input_file.setAttribute('type', 'file');
@@ -399,12 +434,12 @@ class vanillaform {
                     
     
                 }
-                else if (fields[i].fieldtype == 'checkbox' ||
-                        fields[i].fieldtype == 'radio' ||
-                        fields[i].fieldtype == 'select') {
+                else if (fields[i].type == 'checkbox' ||
+                        fields[i].type == 'radio' ||
+                        fields[i].type == 'select') {
     
                     var input_el = null;
-                    if (fields[i].fieldtype == 'select') {
+                    if (fields[i].type == 'select') {
                         input_el = document.createElement('select');
                         input_el.addEventListener('input', function() { fields[i].value = this.value; });
                     } else {
@@ -416,13 +451,13 @@ class vanillaform {
                     
                     var choices = fields[i].choices;
 
-                    if (fields[i].fieldtype == 'checkbox') {
+                    if (fields[i].type == 'checkbox') {
                         fields[i].multiple = true;
-                    } else if (fields[i].fieldtype == 'radio') {
+                    } else if (fields[i].type == 'radio') {
                         fields[i].multiple = false;
                     }
                     
-                    if (fields[i].fieldtype == 'select' && fields[i].multiple) {
+                    if (fields[i].type == 'select' && fields[i].multiple) {
                         input_el.setAttribute('name', `${field_name}[]`);
                         input_el.setAttribute('multiple', '');
                     }
@@ -442,7 +477,7 @@ class vanillaform {
                             choice_value = choice.value;
                         }
                         
-                        if (fields[i].fieldtype == 'select') {
+                        if (fields[i].type == 'select') {
     
                             var sub_input_el = document.createElement('option');
                             sub_input_el.setAttribute('value', choice_value);
@@ -455,10 +490,10 @@ class vanillaform {
                         }  else {
                             
                             var sub_input_el_wrap = document.createElement('div');
-                            sub_input_el_wrap.classList.add(`vanillaform__${fields[i].fieldtype}`);
+                            sub_input_el_wrap.classList.add(`vanillaform__${fields[i].type}`);
 
                             var sub_input_el = document.createElement('input');
-                            sub_input_el.setAttribute('type', fields[i].fieldtype);
+                            sub_input_el.setAttribute('type', fields[i].type);
                             sub_input_el.setAttribute('value', choice_value);
                             sub_input_el.setAttribute('id', `${field_name}[${j}]`);
                             sub_input_el.addEventListener('input', function() { fields[i].value = this.value; });
@@ -487,7 +522,7 @@ class vanillaform {
                 else {
     
                     var input_el = document.createElement('input');
-                    input_el.setAttribute('type', fields[i].fieldtype);
+                    input_el.setAttribute('type', fields[i].type);
                     input_el.setAttribute('name', field_name);
                     input_el.setAttribute('id', field_name);
                     input_el.addEventListener('input', function() { 
@@ -512,34 +547,13 @@ class vanillaform {
 
     }
 
-    build () {
 
-        var self = this;
-        self.el = self.settings.el;
-        self.fields = (function(fields) {
-
-            var arr = [];
-            for (let i = 0; i < fields.length; i++) {
-
-                var field = self.fix_field_data({
-                    settings: fields[i],
-                    index: i
-                });
-                arr.push(field);
-    
-            }
-
-            return arr;
-
-        })(self.settings.fields);   
-        
-        return self;
-
-    }
 
     render () {
 
         var self = this;
+
+        if (self.callbacks && typeof self.callbacks.before_render == 'function') { self.callbacks.before_render(); }
 
         var fields_el = self.render_fields({fields: self.fields, class: 'vanillaform' });
 
@@ -555,6 +569,8 @@ class vanillaform {
 
         self.el.innerHTML = '';
         self.el.appendChild(fields_el);
+
+        if (self.callbacks && typeof self.callbacks.after_render == 'function') { self.callbacks.after_render(); }
 
         return self;
     }

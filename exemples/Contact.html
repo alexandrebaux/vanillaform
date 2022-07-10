@@ -19,24 +19,24 @@
                 {
                     label: "Lastname",
                     name: "lastname",
-                    fieldtype: "text",
+                    type: "text",
                     class: "half"
                 },
                 {
                     label: "Firstname",
                     name: "firstname",
-                    fieldtype: "text",
+                    type: "text",
                     class: "half"
                 },
                 {
                     label: "Email",
                     name: "email",
-                    fieldtype: "email"
+                    type: "email"
                 },
                 {
                     label: "Subject",
                     name: "subject",
-                    fieldtype: "radio",
+                    type: "radio",
                     choices: [
                         {label:"Information request", value: 0},
                         {label:"Billing", value: 1},
@@ -48,12 +48,12 @@
                     label: "Join your document to your message.",
                     input_label: 'Choose Your File',
                     name: "document",
-                    fieldtype: "file"
+                    type: "file"
                 },
                 {
                     label: "Message",
                     name: "message",
-                    fieldtype: "textarea"
+                    type: "textarea"
                 }
             ]
         }).render();
