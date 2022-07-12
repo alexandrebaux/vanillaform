@@ -205,7 +205,25 @@ class vanillaform {
 
         var self = this;
 
-        console.log(data);
+        var data_keys = Object.keys(data);
+
+        var fields = self.fields;
+
+        for (let index = 0; index < fields.length; index++) {
+
+            var v = data[fields[index].name];
+            
+            if (typeof v == 'object') {
+
+                console.log(v);
+
+            } else {
+
+                fields[index].value = v;
+
+            }
+            
+        }
 
         return self;
     }
@@ -216,6 +234,7 @@ class vanillaform {
 
         var fields = param.fields;
         var fields_el = document.createElement('div');
+        var current_depth = param.current_depth || 0;
 
         if (param.class) { fields_el.classList.add(param.class); }
 
@@ -227,6 +246,10 @@ class vanillaform {
             if (fields[i].class) { field_el.classList.add(fields[i].class); }
 
             var field_name = fields[i].name;
+            if (current_depth > 0)  {
+                field_name = `[${field_name}]`;
+            }
+
             if (param.prefix_fields_name) {
                 field_name = param.prefix_fields_name + field_name;
             }
@@ -252,7 +275,8 @@ class vanillaform {
 
                     var subfields_el = self.render_fields({
                         fields: fields[i].fields,
-                        prefix_fields_name: `${field_name}`
+                        prefix_fields_name: `${field_name}`,
+                        current_depth: current_depth + 1
                     });
 
                     subfields_el.classList.add('vanillaform__fields');
@@ -270,7 +294,8 @@ class vanillaform {
                         
                         var subfields_el = self.render_fields({
                             fields: fields[i].childrens[j],
-                            prefix_fields_name: `${field_name}[${j}]`
+                            prefix_fields_name: `${field_name}[${j}]`,
+                            current_depth: current_depth + 1
                         });
                         subfields_el.classList.add('vanillaform__subfield');
 

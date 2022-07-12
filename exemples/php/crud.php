@@ -9,9 +9,9 @@
 
     if (!empty($_POST)) :
 
-        $serialized_post = serialize($_POST);
+        $json_string = json_encode($_POST);
 
-        file_put_contents($target_file, $serialized_post . PHP_EOL, FILE_APPEND);
+        file_put_contents($target_file, $json_string . PHP_EOL, FILE_APPEND);
 
     endif;
     
@@ -34,8 +34,8 @@
         ?>
         <ul>
             <?php foreach ($entries as $key => $entry) : ?>
-                <?php if (!empty($entry)) :  $object = (object) unserialize($entry); ?>   
-                <li><a href="?edit=<?php echo $key; ?>">EDIT -> <?php echo $object->title; ?></a></li>     
+                <?php if (!empty($entry)) :  $object = (object) json_decode($entry); ?>   
+                <li><a href="?edit=<?php echo $key; ?>"><?php echo $object->title; ?></a></li>     
                 <?php endif;?>
             <?php endforeach;  ?>
         </ul>
@@ -145,11 +145,10 @@
 
         <?php 
             
-            if (!empty($_GET['edit'])) {
+            if (isset($_GET['edit'])) {
                 if (!empty($entries[$_GET['edit']])) {
-                    $current_object = unserialize($entries[$_GET['edit']]);
-                    $json_object = json_encode($current_object);
-                    echo "form.set_values($json_object).render();";
+                    $json_string = $entries[$_GET['edit']];
+                    echo "form.set_values($json_string).render();";
                 }
             }
 
