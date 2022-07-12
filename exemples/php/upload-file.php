@@ -7,7 +7,7 @@
 
     $base_dir = __DIR__ . "/../..";
     
-    $target_dir = $base_dir . "/data/";
+    $target_dir = $base_dir . "/exemples/data/";
 
     $target_file = $target_dir . uniqid() . '_' . basename($_FILES["file"]["name"]);
 
