@@ -1,3 +1,21 @@
+<?php
+
+    /**
+     * This is a simple exemple that do not take safety or ideal stack in consideration.
+     */
+
+    $base_dir = __DIR__ . "/../..";
+    $target_file = $base_dir . "/exemples/data/pages.db";
+
+    if (!empty($_POST)) :
+
+        $serialized_post = serialize($_POST);
+
+        file_put_contents($target_file, $serialized_post . PHP_EOL, FILE_APPEND);
+
+    endif;
+    
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,8 +27,22 @@
     <link rel="stylesheet" href="../../vanillaform.css">
 </head>
 <body>
+    <div class="list">
+        <?php
+            $data = file_get_contents($target_file);
+            $entries = explode(PHP_EOL, $data);
+        ?>
+        <ul>
+            <?php foreach ($entries as $key => $entry) : ?>
+                <?php if (!empty($entry)) :  $object = (object) unserialize($entry); ?>   
+                <li><a href="?edit=<?php echo $key; ?>">EDIT -> <?php echo $object->title; ?></a></li>     
+                <?php endif;?>
+            <?php endforeach;  ?>
+        </ul>
+    </div>
     <div class="targeted-wrapper"></div>
     <style>
+        .list, 
         .targeted-wrapper { 
             width: 768px;
             margin: 1em auto;
@@ -35,6 +67,11 @@
                 }
             },
             fields: [
+                {
+                    label: "Title",
+                    name: "title",
+                    type: "text",
+                },
                 {
                     label: "Blocks",
                     name: "blocks",
@@ -104,6 +141,20 @@
                 }
             ]
         }).render();
+
+
+        <?php 
+            
+            if (!empty($_GET['edit'])) {
+                if (!empty($entries[$_GET['edit']])) {
+                    $current_object = unserialize($entries[$_GET['edit']]);
+                    $json_object = json_encode($current_object);
+                    echo "form.set_values($json_object).render();";
+                }
+            }
+
+            
+        ?>
     </script>
 </body>
 </html>

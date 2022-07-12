@@ -201,6 +201,15 @@ class vanillaform {
 
     }
 
+    set_values (data) {
+
+        var self = this;
+
+        console.log(data);
+
+        return self;
+    }
+
     render_fields (param) {
 
         var self = this;
@@ -612,6 +621,12 @@ class vanillaform {
 
         var form = document.createElement('form');
         form.classList.add('vanillaform');
+        form.setAttribute('method', self.settings.method || 'post');
+
+        if (self.settings.endpoints) {
+            form.setAttribute('action', self.settings.endpoints.action || '');
+        } 
+
         form.appendChild(fields_el);
 
         self.el.innerHTML = '';

@@ -67,10 +67,6 @@
     border-radius: var(--border-radius);
 }
 
-.vanillaform__field--has-subfield > .vanillaform__fields {
-    padding: 0.5em 0;
-}
-
 .vanillaform__field {
     position: relative;
     margin: 0 0 0.5em;
@@ -78,7 +74,7 @@
     background-color: var(--field-bg);
 }
 
-.vanillaform__field:not(.vanillaform__field--has-subfield) {
+.vanillaform__field {
     padding: 0 0.5em;
 }
 
