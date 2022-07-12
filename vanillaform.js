@@ -422,29 +422,63 @@ class vanillaform {
                     input_file.setAttribute('id', field_name);
                     input_file.classList.add('vanillaform__inputfile');
 
-                    var input_label = document.createElement('label');
-                    input_label.setAttribute('for', field_name);
-                    input_label.innerText = (fields[i].input_label) ? fields[i].input_label : 'Select a file';
-                    input_label.classList.add('vanillaform__inputfilelabel');
+                    var img_preview = document.createElement('img');
+                    img_preview.setAttribute('src', '');
+                    img_preview.classList.add('vanillaform__img__preview');
 
-                    var input_hidden = document.createElement('div');
+                    input_file.addEventListener('change', function() {
+
+                        if (self.settings.endpoints.upload && input_file.files.length > 0) {
+
+                            let formData = new FormData();           
+                            formData.append("file", input_file.files[0]);
+
+                            var oReq = new XMLHttpRequest();
+                            oReq.onload = function(e) {
+
+                                if (self.settings.callbacks.on_upload_response) {
+
+                                    self.settings.callbacks.on_upload_response(oReq.response, input_hidden);
+
+                                    input_hidden.dispatchEvent(new Event('change'));
+
+                                }
+                                
+                            };
+                            oReq.open("POST", self.settings.endpoints.upload, true);
+                            oReq.send(formData);
+
+                        }
+                        
+                    });
+
+                    var button_label = document.createElement('label');
+                    button_label.setAttribute('for', field_name);
+                    button_label.innerText = (fields[i].button_label) ? fields[i].button_label : 'Select a file';
+                    button_label.classList.add('vanillaform__inputfilelabel');
+
+                    var input_hidden = document.createElement('input');
                     input_hidden.setAttribute('type', 'hidden');
                     input_hidden.setAttribute('name', field_name);
-                    input_hidden.addEventListener('input', function() { fields[i].value = this.value; });
-
-                    var input_el = document.createElement('div');
-                    
-                    input_el.appendChild(input_hidden);
-                    input_el.appendChild(input_file);
-                    input_el.appendChild(input_label);
 
                     if (field_value) { input_hidden.value = field_value; }
 
+                    input_hidden.addEventListener('change', function() {
 
-                    // Todo - Send File with Pure Ajax, Assign value and preview file. (MEDIUM)
-                    // Must be configurable !!!
-                    
-    
+                        var v = this.value;
+
+                        fields[i].value = v;
+
+                        img_preview.setAttribute("src", v);
+
+                    });
+
+                    var input_el = document.createElement('div');
+                    input_el.appendChild(input_hidden);
+                    input_el.appendChild(img_preview);
+                    input_el.appendChild(input_file);
+                    input_el.appendChild(button_label); 
+
                 }
                 else if (fields[i].type == 'checkbox' ||
                         fields[i].type == 'radio' ||

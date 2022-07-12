@@ -168,6 +168,21 @@
 
 }
 
+.vanillaform__img__preview[src=''] {
+    display: none;
+}
+
+.vanillaform__img__preview {
+    width: 5rem;
+    height: 5rem;
+    display: block;
+    margin: 0 auto 0.5rem 0;
+    object-fit: contain;
+    object-position: 50% 50%;
+    border: var(--border);
+    border-radius: var(--border-radius);
+}
+
 .vanillaform__submit {
     margin: 1em 0 0;
     padding: 0.5em 0 0;

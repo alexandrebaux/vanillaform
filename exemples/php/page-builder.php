@@ -22,11 +22,16 @@
         var form = new vanillaform({
             el: targeted_wrapper,
             endpoints: {
-                upload: "/upload-file.php"
+                upload: "upload-file.php"
             },
             callbacks: {
-                uploaded: function(response, field) { 
-                    field.value = response; 
+                on_upload_response: function(response, field_el) { 
+
+                    var r = JSON.parse(response);
+                    if (r.success) {
+                        field_el.value = r.path; 
+                    }
+                    
                 }
             },
             fields: [
@@ -46,6 +51,7 @@
                                 {
                                     label: "Image",
                                     name: "image",
+                                    button_label: "Choose an image",
                                     type: "file",
                                 },
                             ]
