@@ -215,15 +215,18 @@ class vanillaform {
 
         var fields = self_fields || self.fields;
 
-        //console.log(data, self_fields);
-
         for (let index = 0; index < fields.length; index++) {
 
             var value = data[fields[index].name];
-        
-            if (fields[index].repeater && value) {
+
+            if (fields[index].fields && value) {
+
+                self.set_values(value, fields[0].fields);
+
+            } else if (fields[index].repeater && value) {
 
                 if (!fields[index].childrens) { fields[index].childrens = []; }
+
                 for (var z = 0; z < value.length; z++) {
                     var element = value[z];
                     var cloned_fields = self.duplicate_fields(fields[index].settings.repeater);
@@ -264,9 +267,11 @@ class vanillaform {
                 for (var z = 0; z < value.length; z++) {
 
                     var children = fields[index].childrens[z];
-                    var element = value[z];
-                    var keys = Object.keys(element);
-                    self.set_values(value[z][keys[0]], children[0].fields);
+                    //var element = value[z];
+                    //var keys = Object.keys(element);
+                    //self.set_values(value[z][keys[0]], children[0].fields);
+
+                    self.set_values(value[z], children);
 
                 }
 
