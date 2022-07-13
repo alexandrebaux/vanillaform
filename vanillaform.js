@@ -221,7 +221,7 @@ class vanillaform {
 
             var value = data[fields[index].name];
         
-            if (fields[index].repeater) {
+            if (fields[index].repeater && value) {
 
                 if (!fields[index].childrens) { fields[index].childrens = []; }
                 for (var z = 0; z < value.length; z++) {
@@ -238,7 +238,7 @@ class vanillaform {
                 }
 
 
-            } else if (fields[index].components) {
+            } else if (fields[index].components && value) {
 
                 for (var z = 0; z < value.length; z++) {
                     var element = value[z];
@@ -270,48 +270,37 @@ class vanillaform {
 
                 }
 
-                
-
-            } else if (fields[index].branches) {
+            } else if (fields[index].branches && value) {
 
                 var childrens_label = fields[index].childrens_label || 'Add Childrens';
                 var childrens_name = fields[index].childrens_name ||  'childrens';
 
                 if (!fields[index].childrens) { fields[index].childrens = []; }
 
-                if (value) {
+                for (var z = 0; z < value.length; z++) {
 
-                    for (var z = 0; z < value.length; z++) {
-    
-                        var element = value[z];
-                        
-                        var cloned_fields = self.duplicate_fields(fields[index].settings.branches);
-    
-                        var childrens = self.duplicate_fields([{
-                            label: childrens_label, childrens_label: childrens_label,
-                            name: childrens_name, childrens_name: childrens_name,
-                            branches: self.duplicate_fields(cloned_fields)
-                        }]);
-    
-                        cloned_fields.push(childrens[0]);
-    
-                        fields[index].childrens.push(cloned_fields);
-    
-                    }
-    
-    
-                    for (var z = 0; z < value.length; z++) {
-    
-                        var children = fields[index].childrens[z];
-                        self.set_values(value[z], children);
-    
-                    }
+                    var element = value[z];
                     
+                    var cloned_fields = self.duplicate_fields(fields[index].settings.branches);
+
+                    var childrens = self.duplicate_fields([{
+                        label: childrens_label, childrens_label: childrens_label,
+                        name: childrens_name, childrens_name: childrens_name,
+                        branches: self.duplicate_fields(cloned_fields)
+                    }]);
+
+                    cloned_fields.push(childrens[0]);
+
+                    fields[index].childrens.push(cloned_fields);
+
                 }
 
-                
+                for (var z = 0; z < value.length; z++) {
 
-                
+                    var children = fields[index].childrens[z];
+                    self.set_values(value[z], children);
+
+                }
                 
             } else if (fields[index].type) {
 
