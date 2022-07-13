@@ -267,10 +267,6 @@ class vanillaform {
                 for (var z = 0; z < value.length; z++) {
 
                     var children = fields[index].childrens[z];
-                    //var element = value[z];
-                    //var keys = Object.keys(element);
-                    //self.set_values(value[z][keys[0]], children[0].fields);
-
                     self.set_values(value[z], children);
 
                 }
