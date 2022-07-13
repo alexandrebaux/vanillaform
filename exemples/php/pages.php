@@ -10,8 +10,7 @@
     if (!empty($_POST)) :
 
         $json_string = json_encode($_POST);
-
-        file_put_contents($target_file, $json_string . PHP_EOL, FILE_APPEND);
+        file_put_contents($target_file, $json_string);
 
     endif;
     
@@ -26,20 +25,6 @@
     <script src="../../vanillaform.js"></script>
     <link rel="stylesheet" href="../../vanillaform.css">
 </head>
-<body>
-    <div class="list">
-        <?php
-            $data = file_get_contents($target_file);
-            $entries = explode(PHP_EOL, $data);
-        ?>
-        <ul>
-            <?php foreach ($entries as $key => $entry) : ?>
-                <?php if (!empty($entry)) :  $object = (object) json_decode($entry); ?>   
-                <li><a href="?edit=<?php echo $key; ?>"><?php echo $object->title; ?></a></li>     
-                <?php endif;?>
-            <?php endforeach;  ?>
-        </ul>
-    </div>
     <div class="targeted-wrapper"></div>
     <style>
         .list, 
@@ -95,7 +80,7 @@
                         },
                         {
                             label: "Call To Action",
-                            name: "status",
+                            name: "cta",
                             type: "textarea",
                             fields: [
                                 {
@@ -122,7 +107,7 @@
                         },
                         {
                             label: "Content",
-                            name: "status",
+                            name: "content",
                             type: "textarea",
                             fields: [
                                 {
@@ -142,18 +127,15 @@
             ]
         }).render();
 
-
         <?php 
             
-            if (isset($_GET['edit'])) {
-                if (!empty($entries[$_GET['edit']])) {
-                    $json_string = $entries[$_GET['edit']];
-                    echo "form.set_values($json_string).render();";
-                }
+            if (file_exists($target_file)) {
+                $json_string = file_get_contents($target_file);
+                echo "form.set_values($json_string).render();";
             }
 
-            
         ?>
+        
     </script>
 </body>
 </html>

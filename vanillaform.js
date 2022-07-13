@@ -6,22 +6,7 @@ class vanillaform {
         self.settings = settings;
         
         self.el = self.settings.el;
-        self.fields = (function(fields) {
-
-            var arr = [];
-            for (let i = 0; i < fields.length; i++) {
-
-                var field = self.fix_field_data({
-                    settings: fields[i],
-                    index: i
-                });
-                arr.push(field);
-    
-            }
-
-            return arr;
-
-        })(self.settings.fields);   
+        self.fields = self.duplicate_fields(self.settings.fields);   
     
     }
    
@@ -37,8 +22,30 @@ class vanillaform {
         if (!field.label) { field.label = `Label ${param.index}`; }
         if (!field.type) { field.type = `text`; }
 
+        if (field.fields || field.repeater || field.branches || field.components) { field.type = null; }
+
         return field;
         
+    }
+
+    duplicate_fields (fields) {
+
+        var self = this;
+
+        var clone = fields.map(function(field, index){
+                                
+            return self.fix_field_data({
+                settings: field,
+                index: index
+            });
+            
+        });
+    
+        var clone = clone;
+            clone = JSON.stringify(clone);
+            clone = JSON.parse(clone);
+
+        return clone;
     }
 
     removable (el, field, index) {
@@ -201,25 +208,114 @@ class vanillaform {
 
     }
 
-    set_values (data) {
+
+    set_values (data, self_fields) {
 
         var self = this;
 
-        var data_keys = Object.keys(data);
+        var fields = self_fields || self.fields;
 
-        var fields = self.fields;
+        //console.log(data, self_fields);
 
         for (let index = 0; index < fields.length; index++) {
 
-            var v = data[fields[index].name];
-            
-            if (typeof v == 'object') {
+            var value = data[fields[index].name];
+        
+            if (fields[index].repeater) {
 
-                console.log(v);
+                if (!fields[index].childrens) { fields[index].childrens = []; }
+                for (var z = 0; z < value.length; z++) {
+                    var element = value[z];
+                    var cloned_fields = self.duplicate_fields(fields[index].settings.repeater);
+                    fields[index].childrens.push(cloned_fields);
+                }
 
-            } else {
+                for (var z = 0; z < value.length; z++) {
 
-                fields[index].value = v;
+                    var children = fields[index].childrens[z];
+                    self.set_values(value[z], fields[index].childrens[z]);
+
+                }
+
+
+            } else if (fields[index].components) {
+
+                for (var z = 0; z < value.length; z++) {
+                    var element = value[z];
+                    var keys = Object.keys(element);
+                        
+                    var cloned_field = null;
+                    var cloned_fields = self.duplicate_fields(fields[index].settings.components); 
+                    for (let c = 0; c < cloned_fields.length; c++) {
+                        if (cloned_fields[c].name == keys[0]) {
+                            cloned_field = cloned_fields[c];
+                        }
+                    }
+                    
+                    if (cloned_field) {
+
+                        if (!fields[index].childrens) { fields[index].childrens = []; }
+                        fields[index].childrens.push([cloned_field]);
+
+                    }
+    
+                }
+                
+                for (var z = 0; z < value.length; z++) {
+
+                    var children = fields[index].childrens[z];
+                    var element = value[z];
+                    var keys = Object.keys(element);
+                    self.set_values(value[z][keys[0]], children[0].fields);
+
+                }
+
+                
+
+            } else if (fields[index].branches) {
+
+                var childrens_label = fields[index].childrens_label || 'Add Childrens';
+                var childrens_name = fields[index].childrens_name ||  'childrens';
+
+                if (!fields[index].childrens) { fields[index].childrens = []; }
+
+                if (value) {
+
+                    for (var z = 0; z < value.length; z++) {
+    
+                        var element = value[z];
+                        
+                        var cloned_fields = self.duplicate_fields(fields[index].settings.branches);
+    
+                        var childrens = self.duplicate_fields([{
+                            label: childrens_label, childrens_label: childrens_label,
+                            name: childrens_name, childrens_name: childrens_name,
+                            branches: self.duplicate_fields(cloned_fields)
+                        }]);
+    
+                        cloned_fields.push(childrens[0]);
+    
+                        fields[index].childrens.push(cloned_fields);
+    
+                    }
+    
+    
+                    for (var z = 0; z < value.length; z++) {
+    
+                        var children = fields[index].childrens[z];
+                        self.set_values(value[z], children);
+    
+                    }
+                    
+                }
+
+                
+
+                
+                
+            } else if (fields[index].type) {
+
+                fields[index].value = value;
 
             }
             
@@ -310,9 +406,7 @@ class vanillaform {
 
                 } else {
                     fields[i].childrens = [];
-                }
-
-                
+                } 
 
                 var add_btn = document.createElement('button');
                     add_btn.classList.add('vanillaform__addbtn');
@@ -321,25 +415,13 @@ class vanillaform {
 
                 if (fields[i].repeater) {
 
-                    var subfields = fields[i].settings.repeater.map(function(field, index){
-                            
-                        return self.fix_field_data({
-                            settings: field,
-                            index: index
-                        });
-                        
-                    });
+                    var cloned_fields = self.duplicate_fields(fields[i].settings.repeater);
 
-                    
                     add_btn.addEventListener('click', function(e){
                         
                         e.preventDefault();
-
-                        var subfields_clone = subfields;
-                        subfields_clone = JSON.stringify(subfields_clone);
-                        subfields_clone = JSON.parse(subfields_clone);
-
-                        fields[i].childrens.push(subfields_clone);
+                        
+                        fields[i].childrens.push(cloned_fields);
 
                         self.render();
 
@@ -349,37 +431,22 @@ class vanillaform {
 
                 } else if (fields[i].components) {
 
-                    var subfields_components = fields[i].settings.components.map(function(field, index){
-                            
-                        return self.fix_field_data({
-                            settings: field,
-                            index: index
-                        });
-                        
-                    });
+                    var cloned_fields = self.duplicate_fields(fields[i].settings.components);
 
-                    var components_select = document.createElement('select');
-                    
-                    for (let l = 0; l < subfields_components.length; l++) {
-                        
+                    var components_select = document.createElement('select');       
+                    for (let l = 0; l < cloned_fields.length; l++) {      
                         var components_select_option = document.createElement('option');
-                        
-                        components_select_option.innerText = subfields_components[l].label;
+                        components_select_option.innerText = cloned_fields[l].label;
                         components_select_option.setAttribute('value', l);
-
                         components_select.appendChild(components_select_option);
-
                     }
                    
                     add_btn.addEventListener('click', function(e){
                         
                         e.preventDefault();
                         
-                        var field_clone = subfields_components[components_select.value];
-                        field_clone = JSON.stringify(field_clone);
-                        field_clone = JSON.parse(field_clone);
-
-                        fields[i].childrens.push([field_clone]);
+                        var cloned_field = cloned_fields[components_select.value];
+                        fields[i].childrens.push([cloned_field]);
 
                         self.render();
 
@@ -387,45 +454,31 @@ class vanillaform {
 
                     var components_select_wrap = document.createElement('div');
                     components_select_wrap.classList.add('vanillaform__componentsaction');
-
                     components_select_wrap.appendChild(components_select);
                     components_select_wrap.appendChild(add_btn);
 
                     field_el.appendChild(components_select_wrap);
 
                 } else if (fields[i].branches) {
-
-                    var branches = fields[i].settings.branches.map(function(e){
-                        return e;
-                    });
                     
                     var childrens_label = fields[i].childrens_label || 'Add Childrens';
                     var childrens_name = fields[i].childrens_name ||  'childrens'
-
-                    branches.push({
+                   
+                    var cloned_fields = self.duplicate_fields(fields[i].settings.branches);
+                    
+                    var childrens = self.duplicate_fields([{
                         label: childrens_label, childrens_label: childrens_label,
                         name: childrens_name, childrens_name: childrens_name,
-                        branches: branches.map(function(e){ return e; })
-                    });
+                        branches: self.duplicate_fields(cloned_fields)
+                    }]);
 
-                    branches = branches.map(function(field, index){
-                            
-                        return self.fix_field_data({
-                            settings: field,
-                            index: index
-                        });
-                        
-                    });
+                    cloned_fields.push(childrens[0]);
 
                     add_btn.addEventListener('click', function(e){
                         
                         e.preventDefault();
 
-                        var branches_clone = branches;
-                        branches_clone = JSON.stringify(branches_clone);
-                        branches_clone = JSON.parse(branches_clone);
-
-                        fields[i].childrens.push(branches_clone);
+                        fields[i].childrens.push(cloned_fields);
 
                         self.render();
 
@@ -506,6 +559,7 @@ class vanillaform {
                         img_preview.setAttribute("src", v);
 
                     });
+                    input_hidden.dispatchEvent(new Event('change'));
 
                     var input_el = document.createElement('div');
                     input_el.appendChild(input_hidden);
@@ -536,8 +590,10 @@ class vanillaform {
                     if (fields[i].type == 'select' && fields[i].multiple) {
                         input_el.setAttribute('name', `${field_name}[]`);
                         input_el.setAttribute('multiple', '');
+                    }else if (fields[i].type == 'select') {
+                        input_el.setAttribute('name', `${field_name}`);
                     }
-                    
+
                     var choices = fields[i].choices;
                     for (let j = 0; j < choices.length; j++) {
                         
