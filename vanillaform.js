@@ -582,7 +582,29 @@ class vanillaform {
                     var input_el = null;
                     if (fields[i].type == 'select') {
                         input_el = document.createElement('select');
-                        input_el.addEventListener('input', function() { fields[i].value = this.value; });
+                        input_el.addEventListener('input', function() {
+
+                            var val = this.value;
+                            if (fields[i].multiple) {
+
+                                if (typeof fields[i].value != 'object') {
+                                    fields[i].value = [];
+                                }
+
+                                if (this.selected && fields[i].value.indexOf(val) == -1) {
+                                    fields[i].value.push(val);
+                                }
+
+                                if (!this.selected) {
+                                    fields[i].value = fields[i].value.filter(function(e){
+                                        return e != val;
+                                    });
+                                }
+
+                            } else {
+                                fields[i].value = val;
+                            }
+                        });
                         input_el.addEventListener('change', function() { self.render(); });
                     } else {
                         input_el = document.createElement('div');
@@ -624,7 +646,15 @@ class vanillaform {
                             sub_input_el.setAttribute('value', choice_value);
                             sub_input_el.innerText = choice_label;
 
-                            if (field_value == choice_value) { sub_input_el.setAttribute('selected', '');  }
+                            if (fields[i].multiple && field_value && field_value.indexOf(choice_value) > -1) {
+
+                                sub_input_el.setAttribute('selected', '');
+
+                            } else if (field_value == choice_value) { 
+
+                                sub_input_el.setAttribute('selected', '');
+                                
+                            }
 
                             input_el.appendChild(sub_input_el);
     
@@ -637,16 +667,57 @@ class vanillaform {
                             sub_input_el.setAttribute('type', fields[i].type);
                             sub_input_el.setAttribute('value', choice_value);
                             sub_input_el.setAttribute('id', `${field_name}[${j}]`);
-                            sub_input_el.addEventListener('input', function() { fields[i].value = this.value; });
                             sub_input_el.addEventListener('change', function() { self.render(); });
-    
-                            if (fields[i].multiple) {
-                                sub_input_el.setAttribute('name', `${field_name}[]`);
-                            } else {
-                                sub_input_el.setAttribute('name', `${field_name}`);
-                            }
 
-                            if (field_value == choice_value) {  sub_input_el.setAttribute('checked', ''); }
+
+                            sub_input_el.addEventListener('input', function() { 
+                                
+                                var val = this.value;
+
+                                if (fields[i].multiple) {
+
+                                    if (typeof fields[i].value != 'object') {
+                                        fields[i].value = [];
+                                    }
+
+                                    if (this.checked && fields[i].value.indexOf(val) == -1) {
+                                        fields[i].value.push(val);
+                                    }
+
+                                    if (!this.checked) {
+                                        fields[i].value = fields[i].value.filter(function(e){
+                                            return e != val;
+                                        });
+                                    }
+
+                                } else {
+
+                                    fields[i].value = val;
+
+                                }
+
+                            
+                            });
+                            
+                            if (fields[i].multiple) {
+
+                                sub_input_el.setAttribute('name', `${field_name}[]`);
+
+                                if (field_value && field_value.indexOf(choice_value) > -1) {
+
+                                    sub_input_el.setAttribute('checked', '');
+
+                                }
+
+                            } else {
+
+                                sub_input_el.setAttribute('name', `${field_name}`);
+
+                                if (field_value == choice_value) {
+                                    sub_input_el.setAttribute('checked', '');
+                                }
+
+                            }
 
                             sub_input_el_wrap.appendChild(sub_input_el);
     
