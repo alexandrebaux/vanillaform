@@ -81,7 +81,6 @@
                         {
                             label: "Call To Action",
                             name: "cta",
-                            type: "textarea",
                             fields: [
                                 {
                                     label: "Title",
@@ -108,7 +107,6 @@
                         {
                             label: "Content",
                             name: "content",
-                            type: "textarea",
                             fields: [
                                 {
                                     label: "Title",

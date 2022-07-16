@@ -34,17 +34,22 @@ class vanillaform {
 
         var clone = fields.map(function(field, index){
                                 
-            return self.fix_field_data({
+            var fixed_field = self.fix_field_data({
                 settings: field,
                 index: index
             });
             
+            var cloned_fixed_field = JSON.stringify(fixed_field);
+            cloned_fixed_field = JSON.parse(cloned_fixed_field);
+
+            if (fixed_field.condition) {
+                cloned_fixed_field.condition = fixed_field.condition;
+            }
+
+            return cloned_fixed_field;
+            
         });
     
-        var clone = clone;
-            clone = JSON.stringify(clone);
-            clone = JSON.parse(clone);
-
         return clone;
     }
 
@@ -326,6 +331,14 @@ class vanillaform {
 
         for (let i = 0; i < fields.length; i++) {
 
+            if (typeof fields[i].condition == 'function') {
+
+                if (!fields[i].condition(self)) {
+                    continue;
+                }
+
+            }
+
             var field_el = document.createElement('div');
             field_el.classList.add('vanillaform__field');
 
@@ -487,6 +500,10 @@ class vanillaform {
                     input_el.setAttribute('name', field_name);
                     input_el.setAttribute('id', field_name);
                     input_el.addEventListener('input', function() { fields[i].value = this.value; });
+
+                    if (fields[i].watch) {
+                        input_el.addEventListener('change', function() { self.render(); });
+                    }
                     
                     if (field_value) { input_el.innerHTML = field_value; }
     
@@ -566,6 +583,7 @@ class vanillaform {
                     if (fields[i].type == 'select') {
                         input_el = document.createElement('select');
                         input_el.addEventListener('input', function() { fields[i].value = this.value; });
+                        input_el.addEventListener('change', function() { self.render(); });
                     } else {
                         input_el = document.createElement('div');
                         input_el.classList.add('vanillaform__group');
@@ -620,6 +638,7 @@ class vanillaform {
                             sub_input_el.setAttribute('value', choice_value);
                             sub_input_el.setAttribute('id', `${field_name}[${j}]`);
                             sub_input_el.addEventListener('input', function() { fields[i].value = this.value; });
+                            sub_input_el.addEventListener('change', function() { self.render(); });
     
                             if (fields[i].multiple) {
                                 sub_input_el.setAttribute('name', `${field_name}[]`);
@@ -653,6 +672,10 @@ class vanillaform {
                         fields[i].value = this.value;
                     
                     });
+                    
+                    if (fields[i].watch) {
+                        input_el.addEventListener('change', function() { self.render(); });
+                    }
 
                     if (field_value) { input_el.setAttribute('value', field_value); }
                     
