@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conditional</title>
+    <script src="../../vanillaform.js"></script>
+    <link rel="stylesheet" href="../../vanillaform.css">
+</head>
+<body>
+    <div class="targeted-wrapper"></div>
+    <style>
+        .targeted-wrapper { 
+            width: 768px;
+            margin: 1em auto;
+        }
+    </style>
+    <script>
+
+        var targeted_wrapper = document.querySelector('.targeted-wrapper');
+        var form = new vanillaform({
+            el: targeted_wrapper,
+            submit_btn_label: 'Send The Message',
+            fields: [
+                {
+                    label: "Lastname",
+                    name: "lastname",
+                    type: "text",
+                    class: "half"
+                },
+                {
+                    label: "Firstname",
+                    name: "firstname",
+                    type: "text",
+                    class: "half"
+                },
+                {
+                    label: "Preferred Contact method",
+                    name: "contact_method",
+                    type: "radio",
+                    choices: [
+                        {label: 'Email', value:'email'},
+                        {label: 'Phone', value:'phone'}
+                    ],
+                },
+                {
+                    label: "Email",
+                    name: "email",
+                    type: "email",
+                    condition: function(e) {
+                        
+                        for (let i = 0; i < e.fields.length; i++) {
+                            const field = e.fields[i];
+                            if (field.name == 'contact_method') {
+                                return (field.value == 'email');
+                            }
+                        }
+
+                        
+                    }
+                },
+                {
+                    label: "Phone",
+                    name: "phone",
+                    type: "phone",
+                    condition: function(e) {
+                        for (let i = 0; i < e.fields.length; i++) {
+                            const field = e.fields[i];
+                            if (field.name == 'contact_method') { 
+                                return (field.value == 'phone');
+                            }
+                        }
+                    }
+                },
+            ]
+        }).render();
+    </script>
+</body>
+</html>
