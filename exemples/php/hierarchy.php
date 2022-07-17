@@ -45,7 +45,7 @@
                 {
                     label: "Hierarchy",
                     name: "hierarchy",
-                    childrens_label: 'Add Subitems',
+                    add_childrens_label: 'Add Subitems',
                     branches: [
                         {
                             label: "Lastname",

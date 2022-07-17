@@ -36,6 +36,10 @@ function VanillaForm(settings) {
                 cloned_fixed_field.condition = fixed_field.condition;
             }
 
+            if (fixed_field.show_add_childrens_btn) {
+                cloned_fixed_field.show_add_childrens_btn = fixed_field.show_add_childrens_btn;
+            }
+
             return cloned_fixed_field;
             
         });
@@ -346,13 +350,13 @@ function VanillaForm(settings) {
 
                 } else if (fields[i].branches) {
                     
-                    var childrens_label = fields[i].childrens_label || 'Add Childrens';
+                    var add_childrens_label = fields[i].add_childrens_label || 'Add Childrens';
                     var childrens_name = fields[i].childrens_name ||  'childrens'
                    
                     var cloned_fields = duplicate_fields(fields[i].settings.branches);
                     
                     var childrens = duplicate_fields([{
-                        label: childrens_label, childrens_label: childrens_label,
+                        label: add_childrens_label, add_childrens_label: add_childrens_label,
                         name: childrens_name, childrens_name: childrens_name,
                         branches: duplicate_fields(cloned_fields)
                     }]);
@@ -368,7 +372,28 @@ function VanillaForm(settings) {
                         self.render();
 
                     });
-                    field_el.appendChild(add_btn);
+
+                    var show_add_childrens_btn_cdn =  true;
+                    
+                    if (typeof fields[i].show_add_childrens_btn == 'function') {
+
+                        show_add_childrens_btn_cdn = fields[i].show_add_childrens_btn({
+                            el : private_el,
+                            settings: private_settings,
+                            fields: private_fields
+                        });
+
+                    } else if (fields[i].show_add_childrens_btn == false) {
+
+                        show_add_childrens_btn_cdn = false;
+                        
+                    }
+
+                    if (show_add_childrens_btn_cdn) {
+
+                        field_el.appendChild(add_btn);
+
+                    }
                     
                 }
 
@@ -720,7 +745,7 @@ function VanillaForm(settings) {
 
             } else if (fields[index].branches && value) {
 
-                var childrens_label = fields[index].childrens_label || 'Add Childrens';
+                var add_childrens_label = fields[index].add_childrens_label || 'Add Childrens';
                 var childrens_name = fields[index].childrens_name ||  'childrens';
 
                 if (!fields[index].childrens) { fields[index].childrens = []; }
@@ -732,7 +757,7 @@ function VanillaForm(settings) {
                     var cloned_fields = duplicate_fields(fields[index].settings.branches);
 
                     var childrens = duplicate_fields([{
-                        label: childrens_label, childrens_label: childrens_label,
+                        label: add_childrens_label, add_childrens_label: add_childrens_label,
                         name: childrens_name, childrens_name: childrens_name,
                         branches: duplicate_fields(cloned_fields)
                     }]);

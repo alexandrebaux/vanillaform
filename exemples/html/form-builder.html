@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Builder</title>
+    <script src="../../vanillaform.js"></script>
+    <link rel="stylesheet" href="../../vanillaform.css">
+</head>
+<body>
+    <div class="targeted-wrapper"></div>
+    <style>
+        .targeted-wrapper { 
+            width: 768px;
+            margin: 1em auto;
+        }
+    </style>
+    <script>
+
+        var targeted_wrapper = document.querySelector('.targeted-wrapper');
+        var form = VanillaForm({
+            el: targeted_wrapper,
+            submit_btn_label: 'Generate Form',
+            fields: [
+                {
+                    label: "Fields",
+                    name: "fields",
+                    add_childrens_label: 'Add Field',
+                    show_add_childrens_btn: function (e) {
+                      
+                        return false;
+                        
+                    },
+                    branches: [
+                        {
+                            label: "Label",
+                            name: "label",
+                            type: "text",
+                            class: "half"
+                        },
+                        {
+                            label: "Name",
+                            name: "name",
+                            type: "text",
+                            class: "half"
+                        },
+                        {
+                            label: "Type",
+                            name: "type",
+                            type: "select",
+                            choices: [
+                                {label: "Text", value: "text"},
+                                {label: "Textarea", value: "textarea"},
+                                {label: "Wysiwyg", value: "wysiwyg"},
+                                {label: "Number", value: "number"},
+                                {label: "Email", value: "email"},
+                                {label: "Date", value: "date"},
+                                {label: "Time", value: "time"},
+                                {label: "Select", value: "select"},
+                                {label: "Checkbox", value: "checkbox"},
+                                {label: "Radio", value: "radio"},
+                                {label: "File", value: "file"},
+                                {label: "Image", value: "image"}, 
+                            ]
+                        },
+
+                    ]
+                },
+            ]
+        }).render();
+    </script>
+</body>
+</html>
