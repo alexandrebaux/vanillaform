@@ -38,7 +38,7 @@
     <script>
 
         var targeted_wrapper = document.querySelector('.targeted-wrapper');
-        var form = new vanillaform({
+        var form = VanillaForm({
             el: targeted_wrapper,
             submit_btn_label: 'Send The Message',
             fields: [

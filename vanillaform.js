@@ -1,18 +1,10 @@
-class vanillaform {
-
-    constructor (settings) {
-        
-        var self = this;
-        self.settings = settings;
-        
-        self.el = self.settings.el;
-        self.fields = self.duplicate_fields(self.settings.fields);   
+function VanillaForm(settings) {
     
-    }
+    /**
+     * Private
+     */
    
-    fix_field_data (param) {
-
-        var self = this;
+    var fix_field_data = function  (param) {
 
         var field = {settings: param.settings};
 
@@ -28,13 +20,11 @@ class vanillaform {
         
     }
 
-    duplicate_fields (fields) {
-
-        var self = this;
+    var duplicate_fields = function  (fields) {
 
         var clone = fields.map(function(field, index){
                                 
-            var fixed_field = self.fix_field_data({
+            var fixed_field = fix_field_data({
                 settings: field,
                 index: index
             });
@@ -53,9 +43,7 @@ class vanillaform {
         return clone;
     }
 
-    removable (el, field, index) {
-
-        var self = this;
+    var removable = function  (el, field, index) {
 
         var rm_btn = document.createElement('button');
         rm_btn.classList.add('vanillaform__rmbtn');
@@ -74,9 +62,7 @@ class vanillaform {
         return true;
     }
 
-    draguable (el, field) {
-
-        var self = this;
+    var draguable = function  (el, field) {
 
         var dragplaceholder = document.createElement('div');
         dragplaceholder.classList.add('vanillaform__dragplaceholder');
@@ -213,115 +199,7 @@ class vanillaform {
 
     }
 
-
-    set_values (data, self_fields) {
-
-        var self = this;
-
-        var fields = self_fields || self.fields;
-
-        for (let index = 0; index < fields.length; index++) {
-
-            var value = data[fields[index].name];
-
-            if (fields[index].fields && value) {
-
-                self.set_values(value, fields[0].fields);
-
-            } else if (fields[index].repeater && value) {
-
-                if (!fields[index].childrens) { fields[index].childrens = []; }
-
-                for (var z = 0; z < value.length; z++) {
-                    var element = value[z];
-                    var cloned_fields = self.duplicate_fields(fields[index].settings.repeater);
-                    fields[index].childrens.push(cloned_fields);
-                }
-
-                for (var z = 0; z < value.length; z++) {
-
-                    var children = fields[index].childrens[z];
-                    self.set_values(value[z], fields[index].childrens[z]);
-
-                }
-
-
-            } else if (fields[index].components && value) {
-
-                for (var z = 0; z < value.length; z++) {
-                    var element = value[z];
-                    var keys = Object.keys(element);
-                        
-                    var cloned_field = null;
-                    var cloned_fields = self.duplicate_fields(fields[index].settings.components); 
-                    for (let c = 0; c < cloned_fields.length; c++) {
-                        if (cloned_fields[c].name == keys[0]) {
-                            cloned_field = cloned_fields[c];
-                        }
-                    }
-                    
-                    if (cloned_field) {
-
-                        if (!fields[index].childrens) { fields[index].childrens = []; }
-                        fields[index].childrens.push([cloned_field]);
-
-                    }
-    
-                }
-                
-                for (var z = 0; z < value.length; z++) {
-
-                    var children = fields[index].childrens[z];
-                    self.set_values(value[z], children);
-
-                }
-
-            } else if (fields[index].branches && value) {
-
-                var childrens_label = fields[index].childrens_label || 'Add Childrens';
-                var childrens_name = fields[index].childrens_name ||  'childrens';
-
-                if (!fields[index].childrens) { fields[index].childrens = []; }
-
-                for (var z = 0; z < value.length; z++) {
-
-                    var element = value[z];
-                    
-                    var cloned_fields = self.duplicate_fields(fields[index].settings.branches);
-
-                    var childrens = self.duplicate_fields([{
-                        label: childrens_label, childrens_label: childrens_label,
-                        name: childrens_name, childrens_name: childrens_name,
-                        branches: self.duplicate_fields(cloned_fields)
-                    }]);
-
-                    cloned_fields.push(childrens[0]);
-
-                    fields[index].childrens.push(cloned_fields);
-
-                }
-
-                for (var z = 0; z < value.length; z++) {
-
-                    var children = fields[index].childrens[z];
-                    self.set_values(value[z], children);
-
-                }
-                
-            } else if (fields[index].type) {
-
-                fields[index].value = value;
-
-            }
-            
-        }
-
-        return self;
-    }
-
-    render_fields (param) {
-
-        var self = this;
+    var render_fields = function  (param) {
 
         var fields = param.fields;
         var fields_el = document.createElement('div');
@@ -333,7 +211,11 @@ class vanillaform {
 
             if (typeof fields[i].condition == 'function') {
 
-                if (!fields[i].condition(self)) {
+                if (!fields[i].condition({
+                    el : private_el,
+                    settings: private_settings,
+                    fields: private_fields
+                })) {
                     continue;
                 }
 
@@ -372,7 +254,7 @@ class vanillaform {
                 
                 if (fields[i].fields) {
 
-                    var subfields_el = self.render_fields({
+                    var subfields_el = render_fields({
                         fields: fields[i].fields,
                         prefix_fields_name: `${field_name}`,
                         current_depth: current_depth + 1
@@ -391,15 +273,15 @@ class vanillaform {
 
                     for (let j = 0; j < fields[i].childrens.length; j++) {
                         
-                        var subfields_el = self.render_fields({
+                        var subfields_el = render_fields({
                             fields: fields[i].childrens[j],
                             prefix_fields_name: `${field_name}[${j}]`,
                             current_depth: current_depth + 1
                         });
                         subfields_el.classList.add('vanillaform__subfield');
 
-                        self.removable(subfields_el, fields[i], j);
-                        self.draguable(subfields_el, fields[i]);
+                        removable(subfields_el, fields[i], j);
+                        draguable(subfields_el, fields[i]);
                         
                         subfields_el_wrapper.appendChild(subfields_el);
 
@@ -418,7 +300,7 @@ class vanillaform {
 
                 if (fields[i].repeater) {
 
-                    var cloned_fields = self.duplicate_fields(fields[i].settings.repeater);
+                    var cloned_fields = duplicate_fields(fields[i].settings.repeater);
 
                     add_btn.addEventListener('click', function(e){
                         
@@ -434,7 +316,7 @@ class vanillaform {
 
                 } else if (fields[i].components) {
 
-                    var cloned_fields = self.duplicate_fields(fields[i].settings.components);
+                    var cloned_fields = duplicate_fields(fields[i].settings.components);
 
                     var components_select = document.createElement('select');       
                     for (let l = 0; l < cloned_fields.length; l++) {      
@@ -467,12 +349,12 @@ class vanillaform {
                     var childrens_label = fields[i].childrens_label || 'Add Childrens';
                     var childrens_name = fields[i].childrens_name ||  'childrens'
                    
-                    var cloned_fields = self.duplicate_fields(fields[i].settings.branches);
+                    var cloned_fields = duplicate_fields(fields[i].settings.branches);
                     
-                    var childrens = self.duplicate_fields([{
+                    var childrens = duplicate_fields([{
                         label: childrens_label, childrens_label: childrens_label,
                         name: childrens_name, childrens_name: childrens_name,
-                        branches: self.duplicate_fields(cloned_fields)
+                        branches: duplicate_fields(cloned_fields)
                     }]);
 
                     cloned_fields.push(childrens[0]);
@@ -522,7 +404,7 @@ class vanillaform {
 
                     input_file.addEventListener('change', function() {
 
-                        if (self.settings.endpoints.upload && input_file.files.length > 0) {
+                        if (private_settings.endpoints.upload && input_file.files.length > 0) {
 
                             let formData = new FormData();           
                             formData.append("file", input_file.files[0]);
@@ -530,16 +412,16 @@ class vanillaform {
                             var oReq = new XMLHttpRequest();
                             oReq.onload = function(e) {
 
-                                if (self.settings.callbacks.on_upload_response) {
+                                if (private_settings.callbacks.on_upload_response) {
 
-                                    self.settings.callbacks.on_upload_response(oReq.response, input_hidden);
+                                    private_settings.callbacks.on_upload_response(oReq.response, input_hidden);
 
                                     input_hidden.dispatchEvent(new Event('change'));
 
                                 }
                                 
                             };
-                            oReq.open("POST", self.settings.endpoints.upload, true);
+                            oReq.open("POST", private_settings.endpoints.upload, true);
                             oReq.send(formData);
 
                         }
@@ -764,42 +646,155 @@ class vanillaform {
 
     }
 
+    
+    var self = {}; 
+    var private_settings = settings; 
+    var private_el = private_settings.el;
+    var private_fields = duplicate_fields(private_settings.fields);  
+
+    /**
+     * PUBLIC
+     */
+
+    
+
+    self.set_values = function (data, self_fields) {
+
+        var fields = self_fields || private_fields;
+
+        for (let index = 0; index < fields.length; index++) {
+
+            var value = data[fields[index].name];
+
+            if (fields[index].fields && value) {
+
+                self.set_values(value, fields[0].fields);
+
+            } else if (fields[index].repeater && value) {
+
+                if (!fields[index].childrens) { fields[index].childrens = []; }
+
+                for (var z = 0; z < value.length; z++) {
+                    var element = value[z];
+                    var cloned_fields = duplicate_fields(fields[index].settings.repeater);
+                    fields[index].childrens.push(cloned_fields);
+                }
+
+                for (var z = 0; z < value.length; z++) {
+
+                    var children = fields[index].childrens[z];
+                    self.set_values(value[z], fields[index].childrens[z]);
+
+                }
 
 
-    render () {
+            } else if (fields[index].components && value) {
 
-        var self = this;
+                for (var z = 0; z < value.length; z++) {
+                    var element = value[z];
+                    var keys = Object.keys(element);
+                        
+                    var cloned_field = null;
+                    var cloned_fields = duplicate_fields(fields[index].settings.components); 
+                    for (let c = 0; c < cloned_fields.length; c++) {
+                        if (cloned_fields[c].name == keys[0]) {
+                            cloned_field = cloned_fields[c];
+                        }
+                    }
+                    
+                    if (cloned_field) {
+
+                        if (!fields[index].childrens) { fields[index].childrens = []; }
+                        fields[index].childrens.push([cloned_field]);
+
+                    }
+    
+                }
+                
+                for (var z = 0; z < value.length; z++) {
+
+                    var children = fields[index].childrens[z];
+                    self.set_values(value[z], children);
+
+                }
+
+            } else if (fields[index].branches && value) {
+
+                var childrens_label = fields[index].childrens_label || 'Add Childrens';
+                var childrens_name = fields[index].childrens_name ||  'childrens';
+
+                if (!fields[index].childrens) { fields[index].childrens = []; }
+
+                for (var z = 0; z < value.length; z++) {
+
+                    var element = value[z];
+                    
+                    var cloned_fields = duplicate_fields(fields[index].settings.branches);
+
+                    var childrens = duplicate_fields([{
+                        label: childrens_label, childrens_label: childrens_label,
+                        name: childrens_name, childrens_name: childrens_name,
+                        branches: duplicate_fields(cloned_fields)
+                    }]);
+
+                    cloned_fields.push(childrens[0]);
+
+                    fields[index].childrens.push(cloned_fields);
+
+                }
+
+                for (var z = 0; z < value.length; z++) {
+
+                    var children = fields[index].childrens[z];
+                    self.set_values(value[z], children);
+
+                }
+                
+            } else if (fields[index].type) {
+
+                fields[index].value = value;
+
+            }
+            
+        }
+
+        return self;
+    }
+
+    self.render = function () {
 
         if (self.callbacks && typeof self.callbacks.before_render == 'function') { self.callbacks.before_render(); }
 
-        var fields_el = self.render_fields({fields: self.fields, class: 'vanillaform__content'});
+        var fields_el = render_fields({fields: private_fields, class: 'vanillaform__content'});
 
         var submit_btn_wrap = document.createElement('div');
         submit_btn_wrap.classList.add('vanillaform__submit');
 
         var submit_btn = document.createElement('button');
         submit_btn.setAttribute('type','submit');
-        submit_btn.innerText = self.settings.submit_btn_label || 'Submit';
+        submit_btn.innerText = private_settings.submit_btn_label || 'Submit';
         submit_btn_wrap.appendChild(submit_btn);
 
         fields_el.appendChild(submit_btn_wrap);
 
         var form = document.createElement('form');
         form.classList.add('vanillaform');
-        form.setAttribute('method', self.settings.method || 'post');
+        form.setAttribute('method', private_settings.method || 'post');
 
-        if (self.settings.endpoints) {
-            form.setAttribute('action', self.settings.endpoints.action || '');
+        if (private_settings.endpoints) {
+            form.setAttribute('action', private_settings.endpoints.action || '');
         } 
 
         form.appendChild(fields_el);
 
-        self.el.innerHTML = '';
-        self.el.appendChild(form);
+        private_el.innerHTML = '';
+        private_el.appendChild(form);
 
         if (self.callbacks && typeof self.callbacks.after_render == 'function') { self.callbacks.after_render(); }
 
         return self;
     }
+
+    return self;
 
 }
