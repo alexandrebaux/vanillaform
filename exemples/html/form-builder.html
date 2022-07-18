@@ -63,9 +63,50 @@
                                 {label: "Fields", value: "fields"}, 
                             ]
                         },
+                        {
+                            label: "Choices",
+                            name: "choices",
+                            repeater: [
+                                {
+                                    label: "Label",
+                                    name: "label",
+                                    type: "text",
+                                    class: "half"
+                                },
+                                {
+                                    label: "Value",
+                                    name: "value",
+                                    type: "text",
+                                    class: "half"
+                                },
+                            ],
+                            condition: function (e) {
+                                
+                                var r = false;
+                                
+                                if (e.neighbors) {
+
+                                    for (let index = 0; index < e.neighbors.length; index++) {
+
+                                        var types = ['select','radio','checkbox'];
+                                        const neighbor = e.neighbors[index];
+                                        if (neighbor.name == 'type' && types.indexOf(neighbor.value) > -1) {
+                                            
+                                            r = true;
+
+                                        }
+
+                                    }
+
+                                }
+
+                                return r;
+
+                            }
+                        },
 
                     ],
-                    show_add_childrens_btn: function (e) {
+                    condition: function (e) {
                         
                         var r = true;
                         if (e.neighbors) {

@@ -3,6 +3,9 @@ function VanillaForm(settings) {
     /**
      * Private
      */
+
+    var main_add_childrens_label = 'Add childrens';
+    var main_childrens_name = 'childrens';
    
     var fix_field_data = function  (param) {
 
@@ -20,6 +23,27 @@ function VanillaForm(settings) {
         
     }
 
+    var deep_clone = function(obj) {
+
+        if (!obj) { return obj;}
+
+        var clone = {};
+        var keys = Object.keys(obj);
+        for (let i = 0; i < keys.length; i++) {
+            
+            const key = keys[i];
+            if (typeof obj[key] != 'object') {
+                clone[key] = obj[key];
+            } else {
+                clone[key] = deep_clone(obj[key]);
+            }
+
+        }
+
+        return obj;
+
+    };
+
     var duplicate_fields = function  (fields) {
 
         var clone = fields.map(function(field, index){
@@ -29,12 +53,8 @@ function VanillaForm(settings) {
                 index: index
             });
             
-            var cloned_fixed_field = JSON.stringify(fixed_field);
-            cloned_fixed_field = JSON.parse(cloned_fixed_field);
 
-            // TODO - copy all function
-            if (fixed_field.condition) { cloned_fixed_field.condition = fixed_field.condition; }
-            if (fixed_field.show_add_childrens_btn) { cloned_fixed_field.show_add_childrens_btn = fixed_field.show_add_childrens_btn; }
+            var cloned_fixed_field = deep_clone(fixed_field);
 
             return cloned_fixed_field;
             
@@ -223,455 +243,434 @@ function VanillaForm(settings) {
 
             }
 
-            var field_el = document.createElement('div');
-            field_el.classList.add('vanillaform__field');
+            var field_el = (function() {
 
-            if (fields[i].class) { field_el.classList.add(fields[i].class); }
+                var field_el = document.createElement('div');
+                field_el.classList.add('vanillaform__field');
 
-            var field_name = fields[i].name;
-            if (current_depth > 0)  {
-                field_name = `[${field_name}]`;
-            }
+                if (fields[i].class) { field_el.classList.add(fields[i].class); }
 
-            if (param.prefix_fields_name) {
-                field_name = param.prefix_fields_name + field_name;
-            }
-
-            var field_value = (fields[i].value) ? fields[i].value : null;
-
-            var label_el = document.createElement('label');
-            label_el.classList.add('vanillaform__label');
-            label_el.innerText = fields[i].label;
-            label_el.setAttribute('for', field_name);
-
-            if (fields[i].fields || fields[i].components || fields[i].repeater || fields[i].branches) {
-
-                var show_add_childrens_btn_cdn =  true;
-                    
-                if (typeof fields[i].show_add_childrens_btn == 'function') {
-
-                    show_add_childrens_btn_cdn = fields[i].show_add_childrens_btn({
-                        el : private_el,
-                        settings: private_settings,
-                        fields: private_fields,
-                        neighbors: fields,
-                        field: fields[i]
-                    });
-
-                } else if (fields[i].show_add_childrens_btn == false) {
-
-                    show_add_childrens_btn_cdn = false;
-                    
+                var field_name = fields[i].name;
+                if (current_depth > 0)  {
+                    field_name = `[${field_name}]`;
                 }
 
-                if (show_add_childrens_btn_cdn) {
+                if (param.prefix_fields_name) {
+                    field_name = param.prefix_fields_name + field_name;
+                }
+
+                var field_value = (fields[i].value) ? fields[i].value : null;
+
+                var label_el = document.createElement('label');
+                label_el.classList.add('vanillaform__label');
+                label_el.innerText = fields[i].label;
+                label_el.setAttribute('for', field_name);
+
+                if (fields[i].type != 'hidden')  {
+
                     field_el.appendChild(label_el);
+                    
                 }
-            
-            } else if (fields[i].type != 'hidden')  {
 
-                field_el.appendChild(label_el);
-                
-            }
+                if (fields[i].fields || fields[i].components || fields[i].repeater || fields[i].branches) {
 
-            if (fields[i].fields || fields[i].components || fields[i].repeater || fields[i].branches) {
 
-                field_el.classList.add('vanillaform__field--has-subfield');
-                
-                if (fields[i].fields) {
+                    field_el.classList.add('vanillaform__field--has-subfield');
+                    
+                    if (fields[i].fields) {
 
-                    var subfields_el = render_fields({
-                        fields: fields[i].fields,
-                        prefix_fields_name: `${field_name}`,
-                        current_depth: current_depth + 1
-                    });
-
-                    subfields_el.classList.add('vanillaform__fields');
-
-                    field_el.appendChild(subfields_el);
-
-                }
-                
-                if (fields[i].childrens) {
-
-                    var subfields_el_wrapper = document.createElement('div');
-                    subfields_el_wrapper.classList.add('vanillaform__subfields_wrapper');
-
-                    for (let j = 0; j < fields[i].childrens.length; j++) {
-                        
                         var subfields_el = render_fields({
-                            fields: fields[i].childrens[j],
-                            prefix_fields_name: `${field_name}[${j}]`,
+                            fields: fields[i].fields,
+                            prefix_fields_name: `${field_name}`,
                             current_depth: current_depth + 1
                         });
-                        subfields_el.classList.add('vanillaform__subfield');
 
-                        removable(subfields_el, fields[i], j);
-                        draguable(subfields_el, fields[i]);
-                        
-                        subfields_el_wrapper.appendChild(subfields_el);
+                        subfields_el.classList.add('vanillaform__fields');
+
+                        field_el.appendChild(subfields_el);
 
                     }
-
-                    field_el.appendChild(subfields_el_wrapper);
-
-                } else {
-                    fields[i].childrens = [];
-                } 
-
-                var add_btn = document.createElement('button');
-                    add_btn.classList.add('vanillaform__addbtn');
-                    add_btn.innerText = '+';
-
-
-                if (fields[i].repeater) {
-
-                    var cloned_fields = duplicate_fields(fields[i].settings.repeater);
-
-                    add_btn.addEventListener('click', function(e){
-                        
-                        e.preventDefault();
-                        
-                        fields[i].childrens.push(cloned_fields);
-
-                        self.render();
-
-                    });
-
-                    field_el.appendChild(add_btn);
-
-                } else if (fields[i].components) {
-
-                    var cloned_fields = duplicate_fields(fields[i].settings.components);
-
-                    var components_select = document.createElement('select');       
-                    for (let l = 0; l < cloned_fields.length; l++) {      
-                        var components_select_option = document.createElement('option');
-                        components_select_option.innerText = cloned_fields[l].label;
-                        components_select_option.setAttribute('value', l);
-                        components_select.appendChild(components_select_option);
-                    }
-                   
-                    add_btn.addEventListener('click', function(e){
-                        
-                        e.preventDefault();
-                        
-                        var cloned_field = cloned_fields[components_select.value];
-                        fields[i].childrens.push([cloned_field]);
-
-                        self.render();
-
-                    });
-
-                    var components_select_wrap = document.createElement('div');
-                    components_select_wrap.classList.add('vanillaform__componentsaction');
-                    components_select_wrap.appendChild(components_select);
-                    components_select_wrap.appendChild(add_btn);
-
-                    field_el.appendChild(components_select_wrap);
-
-                } else if (fields[i].branches) {
                     
-                    var add_childrens_label = fields[i].add_childrens_label || 'Add Childrens';
-                    var childrens_name = fields[i].childrens_name ||  'childrens'
-                   
-                    var cloned_fields = duplicate_fields(fields[i].settings.branches);
-                    
-                    var childrens = duplicate_fields([{
-                        label: add_childrens_label, add_childrens_label: add_childrens_label,
-                        name: childrens_name, childrens_name: childrens_name,
-                        branches: duplicate_fields(cloned_fields),
-                        show_add_childrens_btn: fields[i].show_add_childrens_btn || false
-                    }]);
+                    if (fields[i].childrens) {
 
-                    cloned_fields.push(childrens[0]);
+                        var subfields_el_wrapper = document.createElement('div');
+                        subfields_el_wrapper.classList.add('vanillaform__subfields_wrapper');
 
-                    add_btn.addEventListener('click', function(e){
-                        
-                        e.preventDefault();
+                        for (let j = 0; j < fields[i].childrens.length; j++) {
+                            
+                            var subfields_el = render_fields({
+                                fields: fields[i].childrens[j],
+                                prefix_fields_name: `${field_name}[${j}]`,
+                                current_depth: current_depth + 1
+                            });
+                            subfields_el.classList.add('vanillaform__subfield');
 
-                        fields[i].childrens.push(cloned_fields);
+                            removable(subfields_el, fields[i], j);
+                            draguable(subfields_el, fields[i]);
+                            
+                            subfields_el_wrapper.appendChild(subfields_el);
 
-                        self.render();
+                        }
 
-                    });
+                        field_el.appendChild(subfields_el_wrapper);
 
-                    if (show_add_childrens_btn_cdn) {
+                    } else {
+                        fields[i].childrens = [];
+                    } 
+
+                    var add_btn = document.createElement('button');
+                        add_btn.classList.add('vanillaform__addbtn');
+                        add_btn.innerText = '+';
+
+
+                    if (fields[i].repeater) {
+
+                        var cloned_fields = duplicate_fields(fields[i].settings.repeater);
+
+                        add_btn.addEventListener('click', function(e){
+                            
+                            e.preventDefault();
+                            
+                            fields[i].childrens.push(cloned_fields);
+
+                            self.render();
+
+                        });
 
                         field_el.appendChild(add_btn);
 
-                    }
-                    
-                }
+                    } else if (fields[i].components) {
 
-                    
-            } else if (fields[i].type)  {
-    
-                if (fields[i].type == 'textarea' ||
-                    fields[i].type == 'wysiwyg')  {
-    
-                    var input_el = document.createElement('textarea');
-                    input_el.setAttribute('name', field_name);
-                    input_el.setAttribute('id', field_name);
-                    input_el.addEventListener('input', function() { fields[i].value = this.value; });
+                        var cloned_fields = duplicate_fields(fields[i].settings.components);
 
-                    if (fields[i].watch) {
-                        input_el.addEventListener('change', function() { self.render(); });
-                    }
-                    
-                    if (field_value) { input_el.innerHTML = field_value; }
-    
-                }
-                else if (fields[i].type == 'image' ||
-                        fields[i].type == 'file') {
-    
-                    var input_file = document.createElement('input');
-                    input_file.setAttribute('type', 'file');
-                    input_file.setAttribute('id', field_name);
-                    input_file.classList.add('vanillaform__inputfile');
-
-                    var img_preview = document.createElement('img');
-                    img_preview.setAttribute('src', '');
-                    img_preview.classList.add('vanillaform__img__preview');
-
-                    input_file.addEventListener('change', function() {
-
-                        if (private_settings.endpoints.upload && input_file.files.length > 0) {
-
-                            let formData = new FormData();           
-                            formData.append("file", input_file.files[0]);
-
-                            var oReq = new XMLHttpRequest();
-                            oReq.onload = function(e) {
-
-                                if (private_settings.callbacks.on_upload_response) {
-
-                                    private_settings.callbacks.on_upload_response(oReq.response, input_hidden);
-
-                                    input_hidden.dispatchEvent(new Event('change'));
-
-                                }
-                                
-                            };
-                            oReq.open("POST", private_settings.endpoints.upload, true);
-                            oReq.send(formData);
-
+                        var components_select = document.createElement('select');       
+                        for (let l = 0; l < cloned_fields.length; l++) {      
+                            var components_select_option = document.createElement('option');
+                            components_select_option.innerText = cloned_fields[l].label;
+                            components_select_option.setAttribute('value', l);
+                            components_select.appendChild(components_select_option);
                         }
-                        
-                    });
-
-                    var button_label = document.createElement('label');
-                    button_label.setAttribute('for', field_name);
-                    button_label.innerText = (fields[i].button_label) ? fields[i].button_label : 'Select a file';
-                    button_label.classList.add('vanillaform__inputfilelabel');
-
-                    var input_hidden = document.createElement('input');
-                    input_hidden.setAttribute('type', 'hidden');
-                    input_hidden.setAttribute('name', field_name);
-
-                    if (field_value) { input_hidden.value = field_value; }
-
-                    input_hidden.addEventListener('change', function() {
-
-                        var v = this.value;
-
-                        fields[i].value = v;
-
-                        img_preview.setAttribute("src", v);
-
-                    });
-                    input_hidden.dispatchEvent(new Event('change'));
-
-                    var input_el = document.createElement('div');
-                    input_el.appendChild(input_hidden);
-                    input_el.appendChild(img_preview);
-                    input_el.appendChild(input_file);
-                    input_el.appendChild(button_label); 
-
-                }
-                else if (fields[i].type == 'checkbox' ||
-                        fields[i].type == 'radio' ||
-                        fields[i].type == 'select') {
-    
-                    var input_el = null;
-                    if (fields[i].type == 'select') {
-                        input_el = document.createElement('select');
-                        input_el.addEventListener('input', function() {
-
-                            var val = this.value;
-                            if (fields[i].multiple) {
-
-                                if (typeof fields[i].value != 'object') {
-                                    fields[i].value = [];
-                                }
-
-                                if (this.selected && fields[i].value.indexOf(val) == -1) {
-                                    fields[i].value.push(val);
-                                }
-
-                                if (!this.selected) {
-                                    fields[i].value = fields[i].value.filter(function(e){
-                                        return e != val;
-                                    });
-                                }
-
-                            } else {
-                                fields[i].value = val;
-                            }
-                        });
-                        input_el.addEventListener('change', function() { self.render(); });
-                    } else {
-                        input_el = document.createElement('div');
-                        input_el.classList.add('vanillaform__group');
-                    }
-    
-                    if (fields[i].type == 'checkbox') {
-                        fields[i].multiple = true;
-                    } else if (fields[i].type == 'radio') {
-                        fields[i].multiple = false;
-                    }
                     
-                    if (fields[i].type == 'select' && fields[i].multiple) {
-                        input_el.setAttribute('name', `${field_name}[]`);
-                        input_el.setAttribute('multiple', '');
-                    }else if (fields[i].type == 'select') {
-                        input_el.setAttribute('name', `${field_name}`);
-                    }
-
-                    var choices = fields[i].choices;
-                    for (let j = 0; j < choices.length; j++) {
-                        
-                        var choice = choices[j];
-
-                        var choice_label = '';
-                        var choice_value = '';
-    
-                        if (typeof choice == 'string') {
-                            choice_label = choice;
-                            choice_value = choice; 
-                        } else if (typeof choice == 'object') {
-                            choice_label = choice.label;
-                            choice_value = choice.value;
-                        }
-                        
-                        if (fields[i].type == 'select') {
-    
-                            var sub_input_el = document.createElement('option');
-                            sub_input_el.setAttribute('value', choice_value);
-                            sub_input_el.innerText = choice_label;
-
-                            if (fields[i].multiple && field_value && field_value.indexOf(choice_value) > -1) {
-
-                                sub_input_el.setAttribute('selected', '');
-
-                            } else if (field_value == choice_value) { 
-
-                                sub_input_el.setAttribute('selected', '');
-                                
-                            }
-
-                            input_el.appendChild(sub_input_el);
-    
-                        }  else {
+                        add_btn.addEventListener('click', function(e){
                             
-                            var sub_input_el_wrap = document.createElement('div');
-                            sub_input_el_wrap.classList.add(`vanillaform__${fields[i].type}`);
+                            e.preventDefault();
+                            
+                            var cloned_field = cloned_fields[components_select.value];
+                            fields[i].childrens.push([cloned_field]);
 
-                            var sub_input_el = document.createElement('input');
-                            sub_input_el.setAttribute('type', fields[i].type);
-                            sub_input_el.setAttribute('value', choice_value);
-                            sub_input_el.setAttribute('id', `${field_name}[${j}]`);
-                            sub_input_el.addEventListener('change', function() { self.render(); });
+                            self.render();
 
+                        });
 
-                            sub_input_el.addEventListener('input', function() { 
-                                
+                        var components_select_wrap = document.createElement('div');
+                        components_select_wrap.classList.add('vanillaform__componentsaction');
+                        components_select_wrap.appendChild(components_select);
+                        components_select_wrap.appendChild(add_btn);
+
+                        field_el.appendChild(components_select_wrap);
+
+                    } else if (fields[i].branches) {
+                        
+                        var add_childrens_label = fields[i].add_childrens_label || main_add_childrens_label;
+                        var childrens_name = fields[i].childrens_name ||  main_childrens_name
+                    
+                        var cloned_fields = duplicate_fields(fields[i].settings.branches);
+                        
+                        var childrens = duplicate_fields([{
+                            label: add_childrens_label, add_childrens_label: add_childrens_label,
+                            name: childrens_name, childrens_name: childrens_name,
+                            branches: duplicate_fields(cloned_fields),
+                            condition: fields[i].condition
+                        }]);
+
+                        cloned_fields.push(childrens[0]);
+
+                        add_btn.addEventListener('click', function(e){
+                            
+                            e.preventDefault();
+
+                            fields[i].childrens.push(cloned_fields);
+
+                            self.render();
+
+                        });
+
+                        field_el.appendChild(add_btn);
+                        
+                    }
+
+                        
+                } else if (fields[i].type)  {
+        
+                    if (fields[i].type == 'textarea' ||
+                        fields[i].type == 'wysiwyg')  {
+        
+                        var input_el = document.createElement('textarea');
+                        input_el.setAttribute('name', field_name);
+                        input_el.setAttribute('id', field_name);
+                        input_el.addEventListener('input', function() { fields[i].value = this.value; });
+
+                        if (fields[i].watch) {
+                            input_el.addEventListener('change', function() { self.render(); });
+                        }
+                        
+                        if (field_value) { input_el.innerHTML = field_value; }
+        
+                    }
+                    else if (fields[i].type == 'image' ||
+                            fields[i].type == 'file') {
+        
+                        var input_file = document.createElement('input');
+                        input_file.setAttribute('type', 'file');
+                        input_file.setAttribute('id', field_name);
+                        input_file.classList.add('vanillaform__inputfile');
+
+                        var img_preview = document.createElement('img');
+                        img_preview.setAttribute('src', '');
+                        img_preview.classList.add('vanillaform__img__preview');
+
+                        input_file.addEventListener('change', function() {
+
+                            if (private_settings.endpoints.upload && input_file.files.length > 0) {
+
+                                let formData = new FormData();           
+                                formData.append("file", input_file.files[0]);
+
+                                var oReq = new XMLHttpRequest();
+                                oReq.onload = function(e) {
+
+                                    if (private_settings.callbacks.on_upload_response) {
+
+                                        private_settings.callbacks.on_upload_response(oReq.response, input_hidden);
+
+                                        input_hidden.dispatchEvent(new Event('change'));
+
+                                    }
+                                    
+                                };
+                                oReq.open("POST", private_settings.endpoints.upload, true);
+                                oReq.send(formData);
+
+                            }
+                            
+                        });
+
+                        var button_label = document.createElement('label');
+                        button_label.setAttribute('for', field_name);
+                        button_label.innerText = (fields[i].button_label) ? fields[i].button_label : 'Select a file';
+                        button_label.classList.add('vanillaform__inputfilelabel');
+
+                        var input_hidden = document.createElement('input');
+                        input_hidden.setAttribute('type', 'hidden');
+                        input_hidden.setAttribute('name', field_name);
+
+                        if (field_value) { input_hidden.value = field_value; }
+
+                        input_hidden.addEventListener('change', function() {
+
+                            var v = this.value;
+
+                            fields[i].value = v;
+
+                            img_preview.setAttribute("src", v);
+
+                        });
+                        input_hidden.dispatchEvent(new Event('change'));
+
+                        var input_el = document.createElement('div');
+                        input_el.appendChild(input_hidden);
+                        input_el.appendChild(img_preview);
+                        input_el.appendChild(input_file);
+                        input_el.appendChild(button_label); 
+
+                    }
+                    else if (fields[i].type == 'checkbox' ||
+                            fields[i].type == 'radio' ||
+                            fields[i].type == 'select') {
+        
+                        var input_el = null;
+                        if (fields[i].type == 'select') {
+                            input_el = document.createElement('select');
+                            input_el.addEventListener('input', function() {
+
                                 var val = this.value;
-
                                 if (fields[i].multiple) {
 
                                     if (typeof fields[i].value != 'object') {
                                         fields[i].value = [];
                                     }
 
-                                    if (this.checked && fields[i].value.indexOf(val) == -1) {
+                                    if (this.selected && fields[i].value.indexOf(val) == -1) {
                                         fields[i].value.push(val);
                                     }
 
-                                    if (!this.checked) {
+                                    if (!this.selected) {
                                         fields[i].value = fields[i].value.filter(function(e){
                                             return e != val;
                                         });
                                     }
 
                                 } else {
-
                                     fields[i].value = val;
-
                                 }
-
-                            
                             });
+                            input_el.addEventListener('change', function() { self.render(); });
+                        } else {
+                            input_el = document.createElement('div');
+                            input_el.classList.add('vanillaform__group');
+                        }
+        
+                        if (fields[i].type == 'checkbox') {
+                            fields[i].multiple = true;
+                        } else if (fields[i].type == 'radio') {
+                            fields[i].multiple = false;
+                        }
+                        
+                        if (fields[i].type == 'select' && fields[i].multiple) {
+                            input_el.setAttribute('name', `${field_name}[]`);
+                            input_el.setAttribute('multiple', '');
+                        }else if (fields[i].type == 'select') {
+                            input_el.setAttribute('name', `${field_name}`);
+                        }
+
+                        var choices = fields[i].choices;
+                        for (let j = 0; j < choices.length; j++) {
                             
-                            if (fields[i].multiple) {
+                            var choice = choices[j];
 
-                                sub_input_el.setAttribute('name', `${field_name}[]`);
-
-                                if (field_value && field_value.indexOf(choice_value) > -1) {
-
-                                    sub_input_el.setAttribute('checked', '');
-
-                                }
-
-                            } else {
-
-                                sub_input_el.setAttribute('name', `${field_name}`);
-
-                                if (field_value == choice_value) {
-                                    sub_input_el.setAttribute('checked', '');
-                                }
-
+                            var choice_label = '';
+                            var choice_value = '';
+        
+                            if (typeof choice == 'string') {
+                                choice_label = choice;
+                                choice_value = choice; 
+                            } else if (typeof choice == 'object') {
+                                choice_label = choice.label;
+                                choice_value = choice.value;
                             }
-
-                            sub_input_el_wrap.appendChild(sub_input_el);
-    
-                            var sub_label_el = document.createElement('label');
-                            sub_label_el.innerText = choice_label;
-                            sub_label_el.setAttribute('for', `${field_name}[${j}]`);    
-                            sub_input_el_wrap.appendChild(sub_label_el);
                             
-                            input_el.appendChild(sub_input_el_wrap);
+                            if (fields[i].type == 'select') {
+        
+                                var sub_input_el = document.createElement('option');
+                                sub_input_el.setAttribute('value', choice_value);
+                                sub_input_el.innerText = choice_label;
+
+                                if (fields[i].multiple && field_value && field_value.indexOf(choice_value) > -1) {
+
+                                    sub_input_el.setAttribute('selected', '');
+
+                                } else if (field_value == choice_value) { 
+
+                                    sub_input_el.setAttribute('selected', '');
+                                    
+                                }
+
+                                input_el.appendChild(sub_input_el);
+        
+                            }  else {
+                                
+                                var sub_input_el_wrap = document.createElement('div');
+                                sub_input_el_wrap.classList.add(`vanillaform__${fields[i].type}`);
+
+                                var sub_input_el = document.createElement('input');
+                                sub_input_el.setAttribute('type', fields[i].type);
+                                sub_input_el.setAttribute('value', choice_value);
+                                sub_input_el.setAttribute('id', `${field_name}[${j}]`);
+                                sub_input_el.addEventListener('change', function() { self.render(); });
+
+
+                                sub_input_el.addEventListener('input', function() { 
+                                    
+                                    var val = this.value;
+
+                                    if (fields[i].multiple) {
+
+                                        if (typeof fields[i].value != 'object') {
+                                            fields[i].value = [];
+                                        }
+
+                                        if (this.checked && fields[i].value.indexOf(val) == -1) {
+                                            fields[i].value.push(val);
+                                        }
+
+                                        if (!this.checked) {
+                                            fields[i].value = fields[i].value.filter(function(e){
+                                                return e != val;
+                                            });
+                                        }
+
+                                    } else {
+
+                                        fields[i].value = val;
+
+                                    }
+
+                                
+                                });
+                                
+                                if (fields[i].multiple) {
+
+                                    sub_input_el.setAttribute('name', `${field_name}[]`);
+
+                                    if (field_value && field_value.indexOf(choice_value) > -1) {
+
+                                        sub_input_el.setAttribute('checked', '');
+
+                                    }
+
+                                } else {
+
+                                    sub_input_el.setAttribute('name', `${field_name}`);
+
+                                    if (field_value == choice_value) {
+                                        sub_input_el.setAttribute('checked', '');
+                                    }
+
+                                }
+
+                                sub_input_el_wrap.appendChild(sub_input_el);
+        
+                                var sub_label_el = document.createElement('label');
+                                sub_label_el.innerText = choice_label;
+                                sub_label_el.setAttribute('for', `${field_name}[${j}]`);    
+                                sub_input_el_wrap.appendChild(sub_label_el);
+                                
+                                input_el.appendChild(sub_input_el_wrap);
+                            }
+                            
                         }
                         
                     }
-                    
-                }
-                else {
-    
-                    var input_el = document.createElement('input');
-                    input_el.setAttribute('type', fields[i].type);
-                    input_el.setAttribute('name', field_name);
-                    input_el.setAttribute('id', field_name);
-                    input_el.addEventListener('input', function() { 
+                    else {
+        
+                        var input_el = document.createElement('input');
+                        input_el.setAttribute('type', fields[i].type);
+                        input_el.setAttribute('name', field_name);
+                        input_el.setAttribute('id', field_name);
+                        input_el.addEventListener('input', function() { 
 
-                        fields[i].value = this.value;
-                    
-                    });
-                    
-                    if (fields[i].watch) {
-                        input_el.addEventListener('change', function() { self.render(); });
+                            fields[i].value = this.value;
+                        
+                        });
+                        
+                        if (fields[i].watch) {
+                            input_el.addEventListener('change', function() { self.render(); });
+                        }
+
+                        if (field_value) { input_el.setAttribute('value', field_value); }
+                        
                     }
 
-                    if (field_value) { input_el.setAttribute('value', field_value); }
+                    field_el.appendChild(input_el);
                     
                 }
-
-                field_el.appendChild(input_el);
                 
-            }
-            
-            fields_el.appendChild(field_el);
+                return field_el;
 
+
+            })();
+
+            fields_el.appendChild(field_el);
         }
 
         return fields_el;
@@ -680,9 +679,9 @@ function VanillaForm(settings) {
 
     
     var self = {}; 
-    var private_settings = settings; 
+    var private_settings = settings;
     var private_el = private_settings.el;
-    var private_fields = duplicate_fields(private_settings.fields);  
+    var private_fields = duplicate_fields(private_settings.fields);
 
     /**
      * PUBLIC
@@ -752,8 +751,8 @@ function VanillaForm(settings) {
 
             } else if (fields[i].branches && value) {
 
-                var add_childrens_label = fields[i].add_childrens_label || 'Add Childrens';
-                var childrens_name = fields[i].childrens_name ||  'childrens';
+                var add_childrens_label = fields[i].add_childrens_label || main_add_childrens_label;
+                var childrens_name = fields[i].childrens_name ||  main_childrens_name;
 
                 if (!fields[i].childrens) { fields[i].childrens = []; }
 
@@ -767,7 +766,7 @@ function VanillaForm(settings) {
                         label: add_childrens_label, add_childrens_label: add_childrens_label,
                         name: childrens_name, childrens_name: childrens_name,
                         branches: duplicate_fields(cloned_fields),
-                        show_add_childrens_btn: fields[i].show_add_childrens_btn || false
+                        condition: fields[i].condition
                     }]);
 
                     cloned_fields.push(childrens[0]);
