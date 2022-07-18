@@ -402,8 +402,7 @@ function VanillaForm(settings) {
                         
                 } else if (fields[i].type)  {
         
-                    if (fields[i].type == 'textarea' ||
-                        fields[i].type == 'wysiwyg')  {
+                    if (fields[i].type == 'textarea')  {
         
                         var input_el = document.createElement('textarea');
                         input_el.setAttribute('name', field_name);
@@ -417,8 +416,7 @@ function VanillaForm(settings) {
                         if (field_value) { input_el.innerHTML = field_value; }
         
                     }
-                    else if (fields[i].type == 'image' ||
-                            fields[i].type == 'file') {
+                    else if (fields[i].type == 'file') {
         
                         var input_file = document.createElement('input');
                         input_file.setAttribute('type', 'file');
