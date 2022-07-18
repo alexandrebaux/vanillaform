@@ -27,11 +27,6 @@
                     label: "Fields",
                     name: "fields",
                     add_childrens_label: 'Add Field',
-                    show_add_childrens_btn: function (e) {
-                      
-                        return false;
-                        
-                    },
                     branches: [
                         {
                             label: "Label",
@@ -61,11 +56,37 @@
                                 {label: "Checkbox", value: "checkbox"},
                                 {label: "Radio", value: "radio"},
                                 {label: "File", value: "file"},
-                                {label: "Image", value: "image"}, 
+                                {label: "Image", value: "image"},
+                                {label: "Repeater", value: "repeater"}, 
+                                {label: "Branches", value: "branches"}, 
+                                {label: "Components", value: "components"}, 
+                                {label: "Fields", value: "fields"}, 
                             ]
                         },
 
-                    ]
+                    ],
+                    show_add_childrens_btn: function (e) {
+                        
+                        var r = true;
+                        if (e.neighbors) {
+
+                            for (let index = 0; index < e.neighbors.length; index++) {
+
+                                var types = ['repeater','branches','components','fields'];
+                                const neighbor = e.neighbors[index];
+                                if (neighbor.name == 'type' && types.indexOf(neighbor.value) == -1) {
+                                    
+                                    r = false;
+
+                                }
+
+                            }
+
+                        }
+
+                        return r;
+                          
+                    },
                 },
             ]
         }).render();

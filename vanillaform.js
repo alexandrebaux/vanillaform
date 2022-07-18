@@ -32,13 +32,9 @@ function VanillaForm(settings) {
             var cloned_fixed_field = JSON.stringify(fixed_field);
             cloned_fixed_field = JSON.parse(cloned_fixed_field);
 
-            if (fixed_field.condition) {
-                cloned_fixed_field.condition = fixed_field.condition;
-            }
-
-            if (fixed_field.show_add_childrens_btn) {
-                cloned_fixed_field.show_add_childrens_btn = fixed_field.show_add_childrens_btn;
-            }
+            // TODO - copy all function
+            if (fixed_field.condition) { cloned_fixed_field.condition = fixed_field.condition; }
+            if (fixed_field.show_add_childrens_btn) { cloned_fixed_field.show_add_childrens_btn = fixed_field.show_add_childrens_btn; }
 
             return cloned_fixed_field;
             
@@ -218,7 +214,9 @@ function VanillaForm(settings) {
                 if (!fields[i].condition({
                     el : private_el,
                     settings: private_settings,
-                    fields: private_fields
+                    fields: private_fields,
+                    neighbors: fields,
+                    field: fields[i]
                 })) {
                     continue;
                 }
@@ -241,12 +239,36 @@ function VanillaForm(settings) {
 
             var field_value = (fields[i].value) ? fields[i].value : null;
 
-            if (fields[i].type != 'hidden')  {
+            var label_el = document.createElement('label');
+            label_el.classList.add('vanillaform__label');
+            label_el.innerText = fields[i].label;
+            label_el.setAttribute('for', field_name);
 
-                var label_el = document.createElement('label');
-                label_el.classList.add('vanillaform__label');
-                label_el.innerText = fields[i].label;
-                label_el.setAttribute('for', field_name);
+            if (fields[i].fields || fields[i].components || fields[i].repeater || fields[i].branches) {
+
+                var show_add_childrens_btn_cdn =  true;
+                    
+                if (typeof fields[i].show_add_childrens_btn == 'function') {
+
+                    show_add_childrens_btn_cdn = fields[i].show_add_childrens_btn({
+                        el : private_el,
+                        settings: private_settings,
+                        fields: private_fields,
+                        neighbors: fields,
+                        field: fields[i]
+                    });
+
+                } else if (fields[i].show_add_childrens_btn == false) {
+
+                    show_add_childrens_btn_cdn = false;
+                    
+                }
+
+                if (show_add_childrens_btn_cdn) {
+                    field_el.appendChild(label_el);
+                }
+            
+            } else if (fields[i].type != 'hidden')  {
 
                 field_el.appendChild(label_el);
                 
@@ -358,7 +380,8 @@ function VanillaForm(settings) {
                     var childrens = duplicate_fields([{
                         label: add_childrens_label, add_childrens_label: add_childrens_label,
                         name: childrens_name, childrens_name: childrens_name,
-                        branches: duplicate_fields(cloned_fields)
+                        branches: duplicate_fields(cloned_fields),
+                        show_add_childrens_btn: fields[i].show_add_childrens_btn || false
                     }]);
 
                     cloned_fields.push(childrens[0]);
@@ -372,22 +395,6 @@ function VanillaForm(settings) {
                         self.render();
 
                     });
-
-                    var show_add_childrens_btn_cdn =  true;
-                    
-                    if (typeof fields[i].show_add_childrens_btn == 'function') {
-
-                        show_add_childrens_btn_cdn = fields[i].show_add_childrens_btn({
-                            el : private_el,
-                            settings: private_settings,
-                            fields: private_fields
-                        });
-
-                    } else if (fields[i].show_add_childrens_btn == false) {
-
-                        show_add_childrens_btn_cdn = false;
-                        
-                    }
 
                     if (show_add_childrens_btn_cdn) {
 
@@ -687,40 +694,40 @@ function VanillaForm(settings) {
 
         var fields = self_fields || private_fields;
 
-        for (let index = 0; index < fields.length; index++) {
+        for (let i = 0; i < fields.length; i++) {
 
-            var value = data[fields[index].name];
+            var value = data[fields[i].name];
 
-            if (fields[index].fields && value) {
+            if (fields[i].fields && value) {
 
                 self.set_values(value, fields[0].fields);
 
-            } else if (fields[index].repeater && value) {
+            } else if (fields[i].repeater && value) {
 
-                if (!fields[index].childrens) { fields[index].childrens = []; }
+                if (!fields[i].childrens) { fields[i].childrens = []; }
 
                 for (var z = 0; z < value.length; z++) {
                     var element = value[z];
-                    var cloned_fields = duplicate_fields(fields[index].settings.repeater);
-                    fields[index].childrens.push(cloned_fields);
+                    var cloned_fields = duplicate_fields(fields[i].settings.repeater);
+                    fields[i].childrens.push(cloned_fields);
                 }
 
                 for (var z = 0; z < value.length; z++) {
 
-                    var children = fields[index].childrens[z];
-                    self.set_values(value[z], fields[index].childrens[z]);
+                    var children = fields[i].childrens[z];
+                    self.set_values(value[z], fields[i].childrens[z]);
 
                 }
 
 
-            } else if (fields[index].components && value) {
+            } else if (fields[i].components && value) {
 
                 for (var z = 0; z < value.length; z++) {
                     var element = value[z];
                     var keys = Object.keys(element);
                         
                     var cloned_field = null;
-                    var cloned_fields = duplicate_fields(fields[index].settings.components); 
+                    var cloned_fields = duplicate_fields(fields[i].settings.components); 
                     for (let c = 0; c < cloned_fields.length; c++) {
                         if (cloned_fields[c].name == keys[0]) {
                             cloned_field = cloned_fields[c];
@@ -729,8 +736,8 @@ function VanillaForm(settings) {
                     
                     if (cloned_field) {
 
-                        if (!fields[index].childrens) { fields[index].childrens = []; }
-                        fields[index].childrens.push([cloned_field]);
+                        if (!fields[i].childrens) { fields[i].childrens = []; }
+                        fields[i].childrens.push([cloned_field]);
 
                     }
     
@@ -738,46 +745,47 @@ function VanillaForm(settings) {
                 
                 for (var z = 0; z < value.length; z++) {
 
-                    var children = fields[index].childrens[z];
+                    var children = fields[i].childrens[z];
                     self.set_values(value[z], children);
 
                 }
 
-            } else if (fields[index].branches && value) {
+            } else if (fields[i].branches && value) {
 
-                var add_childrens_label = fields[index].add_childrens_label || 'Add Childrens';
-                var childrens_name = fields[index].childrens_name ||  'childrens';
+                var add_childrens_label = fields[i].add_childrens_label || 'Add Childrens';
+                var childrens_name = fields[i].childrens_name ||  'childrens';
 
-                if (!fields[index].childrens) { fields[index].childrens = []; }
+                if (!fields[i].childrens) { fields[i].childrens = []; }
 
                 for (var z = 0; z < value.length; z++) {
 
                     var element = value[z];
                     
-                    var cloned_fields = duplicate_fields(fields[index].settings.branches);
+                    var cloned_fields = duplicate_fields(fields[i].settings.branches);
 
                     var childrens = duplicate_fields([{
                         label: add_childrens_label, add_childrens_label: add_childrens_label,
                         name: childrens_name, childrens_name: childrens_name,
-                        branches: duplicate_fields(cloned_fields)
+                        branches: duplicate_fields(cloned_fields),
+                        show_add_childrens_btn: fields[i].show_add_childrens_btn || false
                     }]);
 
                     cloned_fields.push(childrens[0]);
 
-                    fields[index].childrens.push(cloned_fields);
+                    fields[i].childrens.push(cloned_fields);
 
                 }
 
                 for (var z = 0; z < value.length; z++) {
 
-                    var children = fields[index].childrens[z];
+                    var children = fields[i].childrens[z];
                     self.set_values(value[z], children);
 
                 }
                 
-            } else if (fields[index].type) {
+            } else if (fields[i].type) {
 
-                fields[index].value = value;
+                fields[i].value = value;
 
             }
             
