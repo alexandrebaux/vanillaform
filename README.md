@@ -108,7 +108,7 @@ form.render();
 
 # Methods of VanillaForm Object
 
-`render` method allow you to render the form form in the dom element you specify during initialization. See `el` in settings section. This function does not receive parameters.
+`render` method allow you to render the form in the dom element you specify during initialization. See `el` in settings section. This function does not receive parameters.
 
 `set_values` method allow you to set form values. You must call render to see changes. This function does receive an object that contains the values.
 
