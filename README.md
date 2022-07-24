@@ -23,6 +23,8 @@
 
 # Initialize VanillaForm
 
+You can use both `VanillaForm(settings)` or `new VanillaForm(settings)`.
+
 ```
 var targeted_wrapper = document.querySelector('.targeted-wrapper');
 var form = VanillaForm({
@@ -55,6 +57,24 @@ var form = VanillaForm({
 });
 form.render();
 ```
+
+# Methods of VanillaForm Object
+
+`render` method allow you to render the form form in the dom element you specify during initialization. See `el` in settings section. This function does not receive parameters.
+
+`set_values` method allow you to set form values. You must call render to see changes. This function does receive an object that contains the values.
+
+```
+form.set_values({
+    firstname: 'John',
+    lastname: 'Doe',
+    email: 'john.doe@example.com',
+    message: 'An exemple of message',
+});
+form.render();
+```
+
+
 
 
 
