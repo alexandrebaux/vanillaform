@@ -146,8 +146,12 @@ You can use `document.querySelector(selector)` if you need to use a selector.
 {
      fields: [
         {
-            label: "Exemple of label",
-            name: "fieldname"
+            label: "Exemple of label 1",
+            name: "field_name_1",
+        },
+        {
+            label: "Exemple of label 2",
+            name: "field_name_2"
         }
     ]
 }
@@ -182,9 +186,7 @@ Example with string.
     label: "Subject",
     name: "subject",
     type: "radio",
-    choices: [
-        "Information request", "Billing", "Emergency","Other"
-    ]
+    choices: [ "Information request", "Billing", "Emergency", "Other" ]
 }
 ```
 
