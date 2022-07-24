@@ -7,7 +7,7 @@
 
 `vanillaform.js` is the master file of this project. It contains one main JavaScript function called `VanillaForm`.
 
-`vanillaform.css` give you a basic css code that you can adapt to your needs.
+`vanillaform.css` give you a basic CSS code that you can adapt to your needs.
 
 # Basic Usage
 
