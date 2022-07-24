@@ -88,7 +88,7 @@ You can use `document.querySelector(selector)` if you need to use a selector.
 
 ```
 {
- el: document.querySelector('.targeted-wrapper')
+    el: document.querySelector('.targeted-wrapper')
 }
 ```
 
@@ -98,13 +98,30 @@ You can use `document.querySelector(selector)` if you need to use a selector.
 
 ***
 
-`endpoints`
+`fields` is an array of objects that follow the field's structure.
+
+***
+
+`endpoints` is an object that contain the locations to where to send data.
+
+```
+{
+    endpoints: {
+        action: '/path/to/backend',
+        upload: '/path/to/upload_file',
+    }
+}
+```
+
+`upload` is the path where files are sent via ajax immediately after a file has been selected.
+
+`action` is the path where the data is sent when the form is submitted.
+
+***
 
 `callbacks`
 
-`fields`
-
-## Fields
+## field's structure
 
 `label`
 
@@ -123,12 +140,6 @@ You can use `document.querySelector(selector)` if you need to use a selector.
 `repeater`
 
 `fields`
-
-## Endpoints
-
-`upload`
-
-`action`
 
 ## Callbacks
 
