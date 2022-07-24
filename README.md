@@ -153,23 +153,102 @@ You can use `document.querySelector(selector)` if you need to use a selector.
 }
 ```
 
-`label`
+*** 
 
-`name`
+`label` is used to set the label of the field.
 
-`type`
+Default value : `Label N`
 
-`class`
+*** 
 
-`condition`
+`name` is used to set the name of the field.
 
-`choices`
+Default value : `field_N`
+
+*** 
+
+`type` is the type of fields (text, textarea, file, select, checkbox, radio, etc... )
+
+Default value : `text`
+
+*** 
+
+`choices` is an array of string or object. You will use it when type is set to `checkbox`, `radio` or `select`.
+
+Example with string.
+
+```
+{
+    label: "Subject",
+    name: "subject",
+    type: "radio",
+    choices: [
+        "Information request", "Billing", "Emergency","Other"
+    ]
+}
+```
+
+Example with object.
+
+```
+{         
+    label: "Subject",
+    name: "subject",
+    type: "radio",
+    choices: [
+        {label:"Information request", value: "information_request"},
+        {label:"Billing", value: "billing"},
+        {label:"Emergency", value: "emergency"},
+        {label:"Other", value: "other"}
+    ]
+}
+```
+
+*** 
+
+`multiple` is useful when using type `select` if you need to select multiple option.
+
+*** 
+
+`class` is used to add css classes on the dom element that wraps the field.
+
+***
+
+`condition` is a hook function that determines if a field should be visible.
+
+For example, if you want the field `phone` to be visible only when the field `contact_method` is equal to `phone` you will write that.
+
+```
+{
+    label: "Phone",
+    name: "phone",
+    type: "tel",
+    condition: function(e) {
+
+        for (let i = 0; i < e.fields.length; i++) {
+            const field = e.fields[i];
+            if (field.name == 'contact_method') { 
+                return (field.value == 'phone');
+            }
+        }
+
+    }
+}
+```
+
+***
 
 `branches`
 
+***
+
 `components`
 
+***
+
 `repeater`
+
+***
 
 `fields`
 
