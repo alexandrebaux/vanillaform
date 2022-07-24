@@ -25,6 +25,8 @@
 
 You can use both `VanillaForm(settings)` or `new VanillaForm(settings)`.
 
+## Exemple of Initialization
+
 ```
 var targeted_wrapper = document.querySelector('.targeted-wrapper');
 var form = VanillaForm({
@@ -58,6 +60,52 @@ var form = VanillaForm({
 form.render();
 ```
 
+## General Settings
+
+`el`
+
+`submit_btn_label`
+
+`endpoints`
+
+`callbacks`
+
+`fields`
+
+## Fields
+
+`label`
+
+`name`
+
+`type`
+
+`condition`
+
+`choices`
+
+`branches`
+
+`components`
+
+`repeater`
+
+`fields`
+
+## Endpoints
+
+`upload`
+
+`action`
+
+## Callbacks
+
+`before_render`
+
+`after_render`
+
+`on_upload_response`
+
 # Methods of VanillaForm Object
 
 `render` method allow you to render the form form in the dom element you specify during initialization. See `el` in settings section. This function does not receive parameters.
@@ -73,8 +121,5 @@ form.set_values({
 });
 form.render();
 ```
-
-
-
 
 
