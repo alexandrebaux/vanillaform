@@ -33,7 +33,7 @@ Instances have the following methods.
 
 ***
 
-`set_values` method allow you to set form values. You must call render to see changes. This function does receive an object that contains the values.
+`set_values` method allow you to set form values. You must call the render method to see changes. This function does receive an object that contains the values.
 
 ```
 form.set_values({
