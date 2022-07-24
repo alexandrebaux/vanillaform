@@ -23,7 +23,23 @@
 
 # Initialize VanillaForm
 
-You can use both `VanillaForm(settings)` or `new VanillaForm(settings)`.
+You can use both `VanillaForm(settings)` or `new VanillaForm(settings)` to get an instance.
+
+Instances have the following methods.
+
+`render` method allow you to render the form in the dom element you specify during initialization. See `el` in settings section. This function does not receive parameters.
+
+`set_values` method allow you to set form values. You must call render to see changes. This function does receive an object that contains the values.
+
+```
+form.set_values({
+    firstname: 'John',
+    lastname: 'Doe',
+    email: 'john.doe@example.com',
+    message: 'An exemple of message',
+});
+form.render();
+```
 
 ## Exemple of Initialization
 
@@ -60,9 +76,17 @@ var form = VanillaForm({
 form.render();
 ```
 
-## General Settings
+# Settings
 
-`el`
+`el` is the wrapper element where the form is inserted.
+
+You can use `document.querySelector(selector)` if you need to use a selector.
+
+```
+{
+ el: document.querySelector('.targeted-wrapper')
+}
+```
 
 `submit_btn_label`
 
@@ -105,21 +129,5 @@ form.render();
 `after_render`
 
 `on_upload_response`
-
-# Methods of VanillaForm Object
-
-`render` method allow you to render the form in the dom element you specify during initialization. See `el` in settings section. This function does not receive parameters.
-
-`set_values` method allow you to set form values. You must call render to see changes. This function does receive an object that contains the values.
-
-```
-form.set_values({
-    firstname: 'John',
-    lastname: 'Doe',
-    email: 'john.doe@example.com',
-    message: 'An exemple of message',
-});
-form.render();
-```
 
 
