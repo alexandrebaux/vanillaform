@@ -94,6 +94,10 @@ You can use `document.querySelector(selector)` if you need to use a selector.
 
 ***
 
+`method` allows you to specify the method used to send the form. The default value is `post`.
+
+***
+
 `submit_btn_label` allow you to specify the label of the submit button.
 
 ***
