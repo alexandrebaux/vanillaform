@@ -45,7 +45,7 @@ form.set_values({
 form.render();
 ```
 
-## Exemple of Initialization
+## Example of initialization
 
 ```
 var targeted_wrapper = document.querySelector('.targeted-wrapper');
