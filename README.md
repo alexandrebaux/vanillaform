@@ -102,10 +102,6 @@ You can use `document.querySelector(selector)` if you need to use a selector.
 
 ***
 
-`fields` is an array of objects that follow the field's structure.
-
-***
-
 `endpoints` is an object that contain the locations to where to send data.
 
 ```
@@ -123,15 +119,47 @@ You can use `document.querySelector(selector)` if you need to use a selector.
 
 ***
 
-`callbacks`
+`callbacks` is an object that contain function called at some point.
 
-## field's structure
+
+```
+{
+    callbacks: {
+        before_render:  function (){},
+        after_render:  function (){},
+        on_upload_response:  function (){},
+    }
+}
+```
+
+`before_render`
+
+`after_render`
+
+`on_upload_response`
+
+***
+
+`fields` is an array of objects that follow the field's structure.
+
+```
+{
+     fields: [
+        {
+            label: "Exemple of label",
+            name: "fieldname"
+        }
+    ]
+}
+```
 
 `label`
 
 `name`
 
 `type`
+
+`class`
 
 `condition`
 
@@ -145,12 +173,5 @@ You can use `document.querySelector(selector)` if you need to use a selector.
 
 `fields`
 
-## Callbacks
-
-`before_render`
-
-`after_render`
-
-`on_upload_response`
 
 
