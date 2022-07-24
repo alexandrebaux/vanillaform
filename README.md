@@ -94,7 +94,9 @@ You can use `document.querySelector(selector)` if you need to use a selector.
 
 ***
 
-`submit_btn_label`
+`submit_btn_label` allow you to specify the label of the submit button.
+
+***
 
 `endpoints`
 
