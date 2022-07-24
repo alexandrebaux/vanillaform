@@ -88,6 +88,8 @@ You can use `document.querySelector(selector)` if you need to use a selector.
 }
 ```
 
+***
+
 `submit_btn_label`
 
 `endpoints`
