@@ -1,1 +1,54 @@
-**vanillaform** is only a front-end form generator and its development is mainly focused on the *vanillaform.js* and *vanillaform.css* files. However, you will find examples of backend usage in this project. These examples do not contain any code to process the sent data securely. This part is your responsibility.
+#Include `JavaScript` and `CSS`.
+
+```
+<script src="vanillaform.js"></script>
+<link rel="stylesheet" href="vanillaform.css">
+```
+
+`vanillaform.js` is the master file of this project. It contains one main JavaScript function called `VanillaForm`.
+`vanillaform.css` give you a basic css code that you can adapt to your needs.
+
+#Basic Usage
+
+```
+<div class="targeted-wrapper"></div>
+<style>
+    .targeted-wrapper { 
+        width: 768px;
+        margin: 1em auto;
+    }
+</style>
+<script>
+
+    var targeted_wrapper = document.querySelector('.targeted-wrapper');
+    var form = VanillaForm({
+        el: targeted_wrapper,
+        submit_btn_label: 'Send The Message',
+        fields: [
+            {
+                label: "Lastname",
+                name: "lastname",
+                type: "text",
+                class: "half"
+            },
+            {
+                label: "Firstname",
+                name: "firstname",
+                type: "text",
+                class: "half"
+            },
+            {
+                label: "Email",
+                name: "email",
+                type: "email"
+            },
+            {
+                label: "Message",
+                name: "message",
+                type: "textarea"
+            }
+        ]
+    }).render();
+    
+</script>
+```
