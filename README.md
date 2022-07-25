@@ -1,4 +1,6 @@
-# Include `JavaScript` and `CSS`.
+# VanillaForm
+
+## Include `JavaScript` and `CSS`.
 
 ```
 <script src="vanillaform.js"></script>
@@ -9,7 +11,7 @@
 
 `vanillaform.css` give you a basic CSS code that you can adapt to your needs.
 
-# Basic HTML Layout
+## Basic HTML Layout
 
 ```
 <div class="targeted-wrapper"></div>
@@ -21,7 +23,7 @@
 </style>
 ```
 
-# Initialize VanillaForm
+## Initialize VanillaForm
 
 You can use both `VanillaForm(settings)` or `new VanillaForm(settings)` to get an instance.
 
@@ -45,7 +47,7 @@ form.set_values({
 form.render();
 ```
 
-## Example of initialization
+### Example of initialization
 
 ```
 var targeted_wrapper = document.querySelector('.targeted-wrapper');
@@ -80,7 +82,7 @@ var form = VanillaForm({
 form.render();
 ```
 
-# Settings
+## Settings
 
 `el` is the wrapper element where the form is inserted.
 
