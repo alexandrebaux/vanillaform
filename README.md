@@ -134,11 +134,62 @@ You can use `document.querySelector(selector)` if you need to use a selector.
 }
 ```
 
-`before_render`
+***
 
-`after_render`
+`before_render` is fired before rendering the form.
 
-`on_upload_response`
+***
+
+`after_render` is triggered after the form is rendered. It is useful to attach external field customization libraries such as a WYSIWYG, a complex selector or a date picker.
+
+***
+
+`on_upload_response` is triggered after the server has responded to the file upload. It is used to set the value of the `file` field.
+
+Considering the following code at the `upload` endpoint.
+
+```
+    /**
+     * This is a simple exemple that do not take safety in consideration.
+     * Do not forget to put some limitation to file upload.
+     */
+
+    $base_dir = __DIR__ . "/../..";
+    
+    $target_dir = $base_dir . "/exemples/data/";
+
+    $target_file = $target_dir . uniqid() . '_' . basename($_FILES["file"]["name"]);
+
+    if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
+        
+        echo json_encode([
+            "success" => true,
+            "path" =>  str_replace($base_dir, '', $target_file)
+        ]);
+
+    } else {
+
+        echo json_encode([
+            "error" => true
+        ]);
+
+    }
+
+    exit;
+```
+
+You will need to set `on_upload_response` callback like this.
+
+```
+on_upload_response: function(response, field_el) { 
+
+    var r = JSON.parse(response);
+    if (r.success) {
+        field_el.value = r.path; 
+    }
+
+}
+```
 
 ***
 
