@@ -146,7 +146,7 @@ You can use `document.querySelector(selector)` if you need to use a selector.
 
 `on_upload_response` is triggered after the server has responded to the file upload. It is used to set the value of the `file` field.
 
-Considering the following code at the `upload` endpoint.
+Considering the following php code at the `upload` endpoint. 
 
 ```
     /**
