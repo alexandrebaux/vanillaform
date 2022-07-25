@@ -181,13 +181,15 @@ Considering the following php code at the `upload` endpoint.
 You will need to set `on_upload_response` callback like this.
 
 ```
-on_upload_response: function(response, field_el) { 
+{
+    on_upload_response: function(response, field_el) { 
 
-    var r = JSON.parse(response);
-    if (r.success) {
-        field_el.value = r.path; 
+        var r = JSON.parse(response);
+        if (r.success) {
+            field_el.value = r.path; 
+        }
+
     }
-
 }
 ```
 
