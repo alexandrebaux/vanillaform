@@ -240,19 +240,112 @@ For example, if you want the field `phone` to be visible only when the field `co
 
 ***
 
-`branches`
+`branches`, `components`, `repeater` and `fields` are array of fields. 
 
 ***
 
-`components`
+`branches` is a structure where objects can be repeated and have children that contain the same fields. (Family tree, hierarchical representation)
+
+```
+{
+    label: "Hierarchy",
+    name: "hierarchy",
+    add_childrens_label: 'Add Subitems',
+    branches: [
+        {
+            label: "Lastname",
+            name: "lastname",
+            type: "text",
+            class: "half"
+        },
+        {
+            label: "Firstname",
+            name: "firstname",
+            type: "text",
+            class: "half"
+        },
+    ]
+}
+```
 
 ***
 
-`repeater`
+`repeater` allow you to repeat fields. (List of tasks, Participants, Slider)
+
+```
+{
+    label: "Todos",
+    name: "todos",
+    repeater: [
+        {
+            label: "Task",
+            name: "task",
+            type: "textarea"
+        },
+        {
+            label: "Status",
+            name: "status",
+            type: "select",
+            choices: [
+                {value: "new", label: "New"},
+                {value: "doing", label: "Doing"},
+                {value: "label", label: "Done"}
+            ]
+        },
+    ]
+}
+```
 
 ***
 
-`fields`
+`fields` is a group of fields.
+
+`components` is like a repeater with the possibility to choose the group of fields (or the field) you want to add.
+
+```
+{
+    label: "Blocks",
+    name: "blocks",
+    components: [
+        {
+            label: "Slides",
+            name: "slides",
+            repeater: [
+                {
+                    label: "Title",
+                    name: "title",
+                    type: "text",
+                },
+                {
+                    label: "Image",
+                    name: "image",
+                    type: "file",
+                },
+            ]
+        },
+        {
+            label: "Content",
+            name: "status",
+            fields: [
+                {
+                    label: "Title",
+                    name: "title",
+                    type: "text",
+                },
+                {
+                    label: "Content",
+                    name: "content",
+                    type: "textarea",
+                },
+            ]
+        },
+    ]
+}
+```
+
+
+
+
 
 
 
